@@ -1,0 +1,136 @@
+---
+title: "piloto"
+author: "Alexis Rangel"
+date: "2022-10-22"
+output: word_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+## Cargando paquetes y base requeridos
+
+```{r}
+setwd("~/Maestria/Curso propedeutico/coloquio") #estableciendo directorio
+# instalar paquete readr
+#install.packages("readr")
+# cargar paquete readr
+library(readr)
+library(ggplot2)
+library(tidyr)
+library(readxl)
+library(dplyr)
+#file.choose()
+ruta_db = "./DBS/Default of Credit Card Clients Dataset/UCI_Credit_Card.csv"
+
+df1 = read.csv(ruta_db)
+
+```
+
+## Examinando el objeto
+
+```{r}
+class(df1) #verificando que sea un df
+head(df1) #cabeza de df
+str(df1) #generales del df
+names(df1) #columnas del df
+summary(df1) #estadisticas
+length(df1) #largo del df1
+dim(df1)
+
+```
+
+## ¿De qué trata mi base de datos? -Introducción
+
+####Default Payments of Credit Card Clients in Taiwan from 2005 Esta
+base de datos cuenta con variables numericas y categoricas que describen
+la situación crediticia de personas con tarjetas de crédito en Taiwan en
+2005
+
+------------------------------------------------------------------------
+
+¿Qué variables vamos a usar? Todas. ID: ID of each client
+####\*Categoricas SEX: Gender (1=male, 2=female) EDUCATION: (1=graduate
+school, 2=university, 3=high school, 4=others, 5=unknown, 6=unknown)
+MARRIAGE: Marital status (1=married, 2=single, 3=others) AGE: Age in
+years
+
+####\*Numericas LIMIT_BAL: Amount of given credit in NT dollars
+(includes individual and family/supplementary credit PAY_0: Repayment
+status in September, 2005 (-1=pay duly, 1=payment delay for one month,
+2=payment delay for two months, ... 8=payment delay for eight months,
+9=payment delay for nine months and above) PAY_2: Repayment status in
+August, 2005 (scale same as above) PAY_3: Repayment status in July, 2005
+(scale same as above) PAY_4: Repayment status in June, 2005 (scale same
+as above) PAY_5: Repayment status in May, 2005 (scale same as above)
+PAY_6: Repayment status in April, 2005 (scale same as above) BILL_AMT1:
+Amount of bill statement in September, 2005 (NT dollar) BILL_AMT2:
+Amount of bill statement in August, 2005 (NT dollar) BILL_AMT3: Amount
+of bill statement in July, 2005 (NT dollar) BILL_AMT4: Amount of bill
+statement in June, 2005 (NT dollar) BILL_AMT5: Amount of bill statement
+in May, 2005 (NT dollar) BILL_AMT6: Amount of bill statement in April,
+2005 (NT dollar) PAY_AMT1: Amount of previous payment in September, 2005
+(NT dollar) PAY_AMT2: Amount of previous payment in August, 2005 (NT
+dollar) PAY_AMT3: Amount of previous payment in July, 2005 (NT dollar)
+PAY_AMT4: Amount of previous payment in June, 2005 (NT dollar) PAY_AMT5:
+Amount of previous payment in May, 2005 (NT dollar) PAY_AMT6: Amount of
+previous payment in April, 2005 (NT dollar) default.payment.next.month:
+Default payment (1=yes, 0=no)
+
+¿De dónde sacamos la BD?
+<https://www.kaggle.com/datasets/uciml/default-of-credit-card-clients-dataset>
+
+## INTRODUCCIÓN A GGPLOT
+
+#### Una gráfica basica que me muestre la relación entre la educación y el crédito total al que puede acceder´ el cliente
+
+```{r}
+#colnames(df1)
+ggplot(data = df1) +
+  geom_point(mapping = aes(x =EDUCATION, y =LIMIT_BAL ), color="firebrick")
+
+```
+
+#### Aplicando filtros simples al df
+
+```{r}
+# ¿Por qué hay valores en 0 en la columna EDUCATION?
+df1_filtrado = df1[df1$EDUCATION == 0,]
+vector_eduacion0 = df1[df1$EDUCATION == 0,]$EDUCATION
+length(vector_eduacion0)
+```
+
+```{r}
+df1$EDUCATION = as.factor(df1$EDUCATION)
+ggplot(data = df1) +
+  geom_point(mapping = aes(x =SEX, y =ID))
+```
+
+```{r}
+df1$SEX = as.factor(df1$SEX) #Casteando la columna SEX a factor, dado que era un vector de integers
+ggplot(data = df1) +
+  geom_point(mapping = aes(x =EDUCATION, y =LIMIT_BAL, color=SEX))
+```
+
+En general cualquier indicación que se encuentre fuera de la función aes
+modificará todos los puntos de la misma manera, mientras que si se
+encuentra dentro de la función aes cambiará la estética en relación al
+contenido de una variable. Esta variable debe ser indicada, como por
+ejemplo color=tipo_empleo
+
+```{r}
+#ENcontrando valores unicos en un vector
+vector_sex = df1[df1$SEX,]$SEX;unique(vector_sex)
+table(df1$SEX) # contando cuantas mujeres y hombres hay en la base de datos -> (1=male, 2=female)
+```
+
+```{r}
+df1$MARRIAGE = as.factor(df1$MARRIAGE)
+ggplot(data = df1) +
+  geom_point(mapping = aes(x =EDUCATION, y =LIMIT_BAL, color=MARRIAGE, shape= SEX))
+```
+
+```{r}
+ggplot(data = df1) +
+  geom_point(mapping = aes(x =EDUCATION, y =LIMIT_BAL, alpha=AGE))
+```
