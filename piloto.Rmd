@@ -10,11 +10,13 @@ editor_options:
 
 ## Cargando paquetes y base requeridos
 
+#### ESTRUCTURA DE GGPLOT2
+ggplot(data = DATOS) + GEOM_FUNCIÓN( mapping = aes(MAPEOS), stat = ESTADÍSTICAS, po-
+sition = POSICIÓN ) + FUNCIÓN_COORDENADAS + FUNCIÓN_FACETAS
+
 ```{r}
-setwd("~/Maestria/Curso propedeutico/coloquio") #estableciendo directorio
-# instalar paquete readr
-#install.packages("readr")
-# cargar paquete readr
+setwd("~/Maestria/Curso propedeutico/coloquio/ColoquioMAEA") 
+#estableciendo directorio
 library(readr)
 library(ggplot2)
 library(tidyr)
@@ -82,6 +84,44 @@ Default payment (1=yes, 0=no)
 
 ## INTRODUCCIÓN A GGPLOT
 
+#### ANALISIS GRAFICO DESCRIPTIVO DE LA BASE DE DATOS
+
+##### ¿Cuántos de los clientes son hombres y cuantos mujeres?
+```{r}
+#ggplot(data=df1)+
+#  stat_count(mapping = aes(x=SEX))
+
+ggplot(data=df1)+
+  geom_bar(mapping = aes(SEX))
+```
+```{r}
+ggplot(data=df1)+
+  geom_bar(mapping = aes(x=SEX, y=..prop.., group=1))
+´```
+
+##### ¿Cómo se distribuyen por educación?
+
+```{r}
+ggplot(data=df1, aes(x=EDUCATION)) + 
+      geom_bar(aes(y = (..count..)/sum(..count..)))
+
+#ggplot(data=df1)+
+#  stat_count(mapping = aes(x=EDUCATION))
+
+```
+##### ¿Por edad?
+```{r}
+ggplot(data=df1)+
+  stat_count(mapping = aes(x=AGE))
+```
+
+##### ¿Por estado civil?
+
+```{r}
+ggplot(data=df1)+
+  stat_count(mapping = aes(x=MARRIAGE))
+```
+
 #### Una gráfica basica que me muestre la relación entre la educación y el crédito total al que puede acceder´ el cliente
 
 ```{r}
@@ -134,3 +174,161 @@ ggplot(data = df1) +
 ggplot(data = df1) +
   geom_point(mapping = aes(x =EDUCATION, y =LIMIT_BAL, alpha=AGE))
 ```
+###Generando subplots
+
+Observando la relación entre el monto maximo de crédito y la edad del cliente, aislados por sexo
+```{r}
+#Usando facet_wrap para separar por variables categoricas
+ggplot(data=df1)+
+  geom_point(mapping = aes(x =AGE, y =LIMIT_BAL))+
+  facet_wrap(~SEX, nrow=1, ncol=2)
+
+```
+
+```{r}
+
+table(df1$MARRIAGE) #num de observaciones por categoria
+
+ggplot(data=df1)+
+  geom_point(mapping = aes(x =AGE, y =LIMIT_BAL))+
+  facet_wrap(~MARRIAGE, nrow=2, ncol=2)
+
+#Marital status (1=married, 2=single, 3=others)
+
+colnames(df1)
+
+```
+```{r}
+table(df1$MARRIAGE)
+```
+
+```{r}
+ggplot(data=df1)+
+  geom_point(mapping = aes(x =AGE, y =LIMIT_BAL))+
+  facet_wrap(~EDUCATION, nrow=3, ncol=3)
+
+#(1=graduate
+#school, 2=university, 3=high school, 4=others, 5=unknown, 6=unknown)
+
+unique(df1$EDUCATION)
+```
+```{r}
+ggplot(data=df1)+
+  geom_point(mapping = aes(x =AGE, y =LIMIT_BAL))+
+  facet_grid(SEX~EDUCATION)
+```
+
+
+```{r}
+ggplot(data=df1)+
+  geom_point(mapping = aes(x =AGE, y =LIMIT_BAL, color=SEX))+
+  geom_smooth(mapping = aes(x =AGE, y =LIMIT_BAL))
+  
+  
+```
+Pudiendo rescribir y acortar el chunk anterior como sigue, especificando las variables de los ejes y pasando como argumento las geometrias deseadas y sus particularidades
+```{r}
+ggplot(data=df1, mapping = aes(x =AGE, y
+                                =LIMIT_BAL))+
+geom_point(mapping = aes(color=SEX))+
+  geom_smooth()
+```
+```{r}
+ggplot(data=df1, mapping = aes(x =AGE, y
+                                =LIMIT_BAL))+
+geom_point(mapping = aes(color=EDUCATION), show.legend = FALSE)+
+geom_smooth(
+data=filter(df1, SEX==1), se=FALSE)
+```
+```{r}
+ggplot(data=df1, mapping = aes(x =AGE, y
+                                =LIMIT_BAL))+
+geom_point(mapping = aes(color=EDUCATION), show.legend = FALSE)+
+geom_smooth(
+data=filter(df1, SEX==2), se=FALSE)
+```
+
+Credito promedio por sexo del cliente
+```{r}
+#(1=male, 2=female)
+ggplot(data=df1)+
+stat_summary(
+mapping = aes(x=SEX, y=LIMIT_BAL),
+fun.min=min,
+fun.max=max,
+fun=median
+)
+```
+Crédito promedio maximo por edad del cliente
+
+```{r}
+ggplot(data=df1)+
+stat_summary(
+mapping = aes(x=AGE, y=LIMIT_BAL),
+fun.min=min,
+fun.max=max,
+fun=median
+)
+```
+// Por estado civil
+
+```{r}
+#Marital status (1=married, 2=single, 3=others)
+ggplot(data=df1)+
+stat_summary(
+mapping = aes(x=MARRIAGE, y=LIMIT_BAL),
+fun.min=min,
+fun.max=max,
+fun=median
+)
+```
+
+Distribución de estados civiles, por sexo
+```{r}
+ggplot(data=df1)+
+geom_bar(mapping = aes(x=SEX, fill=MARRIAGE))
+```
+Distribución de educación por sexo
+```{r}
+ggplot(data=df1)+
+geom_bar(mapping = aes(x=SEX, fill=EDUCATION))
+#, position = 'stack' >>> Automatico
+#position=“identity”, "dodge", "fill".
+```
+```{r}
+ggplot(data=df1)+
+geom_bar(mapping = aes(x=SEX, fill=EDUCATION), position = 'identity', alpha=2/5)
+```
+```{r}
+ggplot(data=df1)+
+geom_bar(mapping = aes(x=SEX, color=EDUCATION), position = 'identity', fill=NA)
+```
+
+
+```{r}
+ggplot(data=df1)+
+geom_bar(mapping = aes(x=SEX, fill=EDUCATION), position = 'dodge')+
+  labs(title="Observaciones por sexo y nivel educativo", x="Sexo", y="-
+Clientes")
+```
+```{r}
+#Midiendo proporciones
+ggplot(data=df1)+
+geom_bar(mapping = aes(x=SEX, fill=EDUCATION), position = 'fill')
+```
+
+```{r}
+ggplot(data = df1) +
+geom_point(mapping = aes(x=AGE, y =LIMIT_BAL ), position =
+"jitter")
+```
+Box plots
+```{r}
+
+ggplot(data=df1, mapping = aes(x=EDUCATION, y=LIMIT_BAL))+
+geom_boxplot()+
+coord_flip()
+
+
+```
+
