@@ -1,0 +1,265 @@
+---
+title: "manejo de datos"
+author: "Alexis Rangel"
+date: "2022-10-30"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("~/Maestria/Curso propedeutico/coloquio/ColoquioMAEA") 
+#estableciendo directorio
+library(readr)
+library(ggplot2)
+library(tidyr)
+library(readxl)
+library(dplyr)
+library(magrittr)
+#file.choose()
+ruta_db = "./DBS/Default of Credit Card Clients Dataset/UCI_Credit_Card.csv"
+
+df1 = read.csv(ruta_db)
+```
+
+### Función FILTER
+
+```{r}
+#spec(df1)
+head(df1)
+names(df1)
+```
+
+```{r}
+clientes_mujeres <- filter(df1, SEX==2);head(clientes_mujeres)
+
+clientes_mujeres_solteras <- filter(df1, SEX==2, MARRIAGE == 1);head(clientes_mujeres_solteras)
+
+str(clientes_mujeres_solteras)
+
+#para consultar el numeor de registros
+print(length(rownames(clientes_mujeres_solteras)))
+
+
+```
+
+Agregando un operador logico en el filtro
+
+```{r}
+clientes_mujeres_solteras_en_universidad_o_prepa <- filter(df1, SEX==2, MARRIAGE == 1, (EDUCATION == 1 | EDUCATION == 2));head(clientes_mujeres_solteras_en_universidad_o_prepa)
+
+str(clientes_mujeres_solteras_en_universidad_o_prepa)
+
+#para consultar el numeor de registros
+print(length(rownames(clientes_mujeres_solteras_en_universidad_o_prepa)))
+```
+
+#practicando args en python
+
+```{python}
+
+def convertir_temp(*args):
+  print(args, type(args))
+  print(args[0])
+  
+  celsius = [(x-32) * 0.5556 for x in args]
+  return celsius
+  
+  
+  
+temperaturas = [32.0, 100.4, 122.0]
+cels = convertir_temp(*temperaturas)
+print(cels)
+
+
+```
+
+### FUnción SELECT
+```{r}
+df2 = select(df1, ID, EDUCATION, SEX, AGE, MARRIAGE); head(df2)
+#La función select recibe las coolumnas para ordenar, ya sea como tipo string o tipo objeto
+```
+
+```{r}
+df2_0 = select(df1, BILL_AMT1:BILL_AMT6); head(df2_0)
+```
+#### FIltro por exclusión
+```{r}
+df2_01 = select(df1, -(BILL_AMT1:BILL_AMT6)); head(df2_01)
+names(df2_01)
+```
+#### Filtrando por un vector más personalizado
+```{r}
+df2_02 = select(df1, c(ID, BILL_AMT1:BILL_AMT6)); head(df2_02)
+names(df2_02)
+```
+
+Existen algunas otras funcionen que podemos utilizar junto con select():
+
+• starts_with(“abc”) selecciona las variables que comienzan con “abc”
+• ends_with(“xyz”) selecciona las variables que terminan con “xyz”
+• contains(“ijk”) selecciona las variable que en su nombre contienen “ijk”
+enigh_corto2 <- select(enigh, folioviv:sexo_jefe, gasto_mon)
+• matches(“(.)\1”) selecciona las variables que corresponden a una expresión regular
+• num_range(“x”, 1:3) selecciona las variables llamadas x1, x2 y x3
+
+### Seleccionando un df que contenga columnas que cumplan concondiciones especificas:
+
+#### Empiecen con...
+```{r}
+df2_03 = select(df1, starts_with('PAY')); head(df2_03)
+```
+
+#### Num range
+
+```{r}
+df2_04 = select(df1, num_range('PAY_', 0:3)); head(df2_04)
+
+```
+#### Match
+
+```{r}
+df2_05 = select(df1, matches("PAY_A")); head(df2_05)
+```
+
+### Función ARRANGE
+
+##### FIltrando el df por el orden de una variable
+```{r}
+df2_1 = arrange(df2, AGE); head(df2_1)
+df2_2 = arrange(df2, desc(AGE)); head(df2_2) # de mayor a menor (descendente) el ordenamiento
+```
+
+
+##### Filtrando por dos variables, primero ordena por las observaciones de la segunda y luego por el siguiente argumento
+
+```{r}
+names(df2)
+df2_3 = arrange(df2, AGE, EDUCATION); head(df2_3)
+
+```
+### Función MUTATE
+#### Para agregar una nva columna al df o escribir uno nuevo
+
+```{r}
+names(df2)
+df4 = mutate(df2, months_living = AGE * 12);head(df4)
+
+```
+
+
+### Función SUBSTR
+nos ayuda a extraer una cadena de texto indizada de otra cadena de texto
+```{r}
+
+temp1 = 'cadena_texto'; temp1 
+substr(temp1, 3, 6)
+
+```
+
+### Función SUMMARISE
+
+#### Resumen estadistico de el promedio de crédito y el promedio de edad por sexo (masculino)
+
+```{r}
+names(df1)
+estadist1 = summarise(filter(df1, SEX == 1), mean(LIMIT_BAL), mean(AGE)); estadist1
+```
+
+
+```{r}
+estadist1_1 = summarise(filter(df1, SEX == 1, MARRIAGE == 1), mean(LIMIT_BAL), mean(AGE)); estadist1_1
+```
+```{r}
+estadist1_2 = summarise(filter(df1, SEX == 1, MARRIAGE == 2), mean(LIMIT_BAL), mean(AGE)); estadist1_2
+```
+
+#### Resumen estadistico de el promedio de crédito y el promedio de edad por sexo (femenino)
+```{r}
+estadist2_1 = summarise(filter(df1, SEX == 2), mean(LIMIT_BAL), mean(AGE)); estadist2_1
+```
+
+#### Resumen estadistico de el promedio de crédito y el promedio de edad por sexo (femenino) y estado civil casadas (1)
+```{r}
+#mujeres casada
+estadist2_1 = summarise(filter(df1, SEX == 2, MARRIAGE == 1), mean(LIMIT_BAL), mean(AGE)); estadist2_1
+
+```
+```{r}
+#mujeres casada
+estadist2_2 = summarise(filter(df1, SEX == 2, MARRIAGE == 2), mean(LIMIT_BAL), mean(AGE)); estadist2_2
+```
+Valdria mucho la pena poder tener un df agrupado por nivel educativo, sexo, edad y estado civil, como se distribuye el credito promedio aprobado (y cuanto representa de la población ese grupo, dado que seguramente tienen diferentes tamaños)
+
+
+```{r}
+df1_corto = select(df1, SEX, MARRIAGE, LIMIT_BAL, EDUCATION, AGE)
+```
+
+```{r}
+grupos_escolares = group_by(df1, EDUCATION); grupos_escolares
+summarise(grupos_escolares, mean(AGE), mean(LIMIT_BAL))
+
+```
+#Obteniendo por sexo y estado civil, el promedio de edad y el promedio de la linea de crédito, y ordenandolo en descendente por el monto de linea para ver que grupos son más beneficiados
+```{r}
+sexo = group_by(df1, SEX, MARRIAGE); sexo
+
+estadist3 = summarise(sexo, mean(AGE), mean(LIMIT_BAL)); estadist3
+colnames(estadist3) = c('SEX', 'MARRIAGE', 'MEAN_AGE', 'MEAN_LIMIT_BAL')
+estadist3_1 = arrange(estadist3, desc(MEAN_LIMIT_BAL)); estadist3_1
+```
+#Obteniendo por sexo y eduación, el promedio de edad y el promedio de la linea de crédito, y ordenandolo en descendente por el monto de linea para ver que grupos son más beneficiados
+```{r}
+sexo = group_by(df1, SEX, EDUCATION); sexo
+
+estadist4 = summarise(sexo, mean(AGE), mean(LIMIT_BAL)); estadist3
+colnames(estadist4) = c('SEX', 'EDUCATION', 'MEAN_AGE', 'MEAN_LIMIT_BAL')
+estadist4_1 = arrange(estadist4, desc(MEAN_LIMIT_BAL)); estadist4_1
+```
+
+#Obteniendo por sexo, eduación y estado civil, el promedio de edad y el promedio de la linea de crédito, y ordenandolo en descendente por el monto de linea para ver que grupos son más beneficiados
+
+```{r}
+groupedBy = group_by(df1, SEX, EDUCATION, MARRIAGE); groupedBy
+
+estadist5 = summarise(groupedBy, mean(AGE), mean(LIMIT_BAL)); estadist3
+colnames(estadist5) = c('SEX', 'EDUCATION', 'MARRIAGE','MEAN_AGE', 'MEAN_LIMIT_BAL')
+estadist5_1 = arrange(estadist4, desc(MEAN_LIMIT_BAL)); estadist5_1
+```
+
+
+```{r}
+ggplot(data=estadist5_1, mapping = aes(x=EDUCATION, y=MEAN_LIMIT_BAL)) +
+geom_point(aes(size =  MEAN_AGE), alpha = 1/3) + geom_smooth(se=FALSE)
+```
+
+Practicando PIPE
+```{r}
+
+x <-  1:10
+logx <- log(x)
+meanlogx <- mean(logx)
+sqrt(meanlogx)
+
+
+sqrt(mean(log(1:10)))
+
+```
+```{r}
+
+1:10 |>
+  log() |>
+  mean() |>
+  sqrt()
+```
+```{r}
+group_by(df1, SEX, EDUCATION, MARRIAGE) |>
+  summarise(mean(AGE), mean(LIMIT_BAL)) |>
+  arrange(EDUCATION)
+```
+

@@ -2,11 +2,16 @@
 title: "piloto"
 author: "Alexis Rangel"
 date: "2022-10-22"
-output: word_document
-editor_options: 
-  markdown: 
+output:
+  html_document:
+    df_print: paged
+editor_options:
+  markdown:
     wrap: 72
 ---
+
+# RMARKDOWN DE GRAFICAS
+#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
 
 ## Cargando paquetes y base requeridos
 
@@ -97,11 +102,14 @@ ggplot(data=df1)+
 ```{r}
 ggplot(data=df1)+
   geom_bar(mapping = aes(x=SEX, y=..prop.., group=1))
-´```
 
-##### ¿Cómo se distribuyen por educación?
+
+
+```
 
 ```{r}
+##### ¿Cómo se distribuyen por educación?
+
 ggplot(data=df1, aes(x=EDUCATION)) + 
       geom_bar(aes(y = (..count..)/sum(..count..)))
 
@@ -109,6 +117,8 @@ ggplot(data=df1, aes(x=EDUCATION)) +
 #  stat_count(mapping = aes(x=EDUCATION))
 
 ```
+
+
 ##### ¿Por edad?
 ```{r}
 ggplot(data=df1)+
