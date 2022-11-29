@@ -1,0 +1,726 @@
+---
+title: "Estadistica descriptiva I"
+author: "Alexis Rangel"
+date: "2022-11-07"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### SHORTCUTS
+ctrl + alt + k selecciona todas las ocurrencias de una NIVEL variable
+ctrl + shift + l selecciona la linea o lineas completas
+CTRL + shift + v para copiar y pegar la celda anterior
+
+### RECURSOS
+
+https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf
+* DATAVIZ GRAL¨
+
+http://www.sthda.com/english/wiki/ggplot2-area-plot-quick-start-guide-r-software-and-data-visualization
+* DATAVIZ GEOM AREA
+
+
+INICIANDO LA ESTADISTICA DESCRIPTIVA Y ANALISIS DE DATOS DE LA BASE DE DATOS
+
+```{r Estableciendo directorio y llamando DBS}
+setwd("~/Maestria/Curso propedeutico/coloquio/ColoquioMAEA") 
+#estableciendo directorio
+library(readr)
+library(ggplot2)
+library(tidyr)
+library(readxl)
+library(dplyr)
+library(magrittr)
+library(glue)
+library(plyr)
+library(patchwork) #for subplots
+library(plotly)#file.choose()
+ruta_db = "./DBS/Default of Credit Card Clients Dataset/UCI_Credit_Card.csv"
+
+df0 = read.csv(ruta_db)
+dfbase = read.csv(ruta_db)
+```
+
+## ¿De qué trata mi base de datos? -Introducción
+
+####Default Payments of Credit Card Clients in Taiwan from 2005 Esta
+base de datos cuenta con NIVEL variables numericas y categoricas que describen
+la situación crediticia de personas con tarjetas de crédito en Taiwan en
+2005
+
+------------------------------------------------------------------------
+
+¿Qué NIVEL variables vamos a usar? Todas. ID: ID of each client
+####\*Categoricas EDUCATION: Gender (1=male, 2=female) MARRIAGE: (1=graduate
+school, 2=university, 3=high school, 4=others, 5=unknown, 6=unknown)
+MARRIAGE: Marital status (1=married, 2=single, 3=others) AGE: Age in
+years
+
+####\*Numericas LIMIT_BAL: Amount of given credit in NT dollars
+(includes individual and family/supplementary credit PAY_0: Repayment
+status in September, 2005 (-1=pay duly, 1=payment delay for one month,
+2=payment delay for two months, ... 8=payment delay for eight months,
+9=payment delay for nine months and above) PAY_2: Repayment status in
+August, 2005 (scale same as above) PAY_3: Repayment status in July, 2005
+(scale same as above) PAY_4: Repayment status in June, 2005 (scale same
+as above) PAY_5: Repayment status in May, 2005 (scale same as above)
+PAY_6: Repayment status in April, 2005 (scale same as above) BILL_AMT1:
+Amount of bill statement in September, 2005 (NT dollar) BILL_AMT2:
+Amount of bill statement in August, 2005 (NT dollar) BILL_AMT3: Amount
+of bill statement in July, 2005 (NT dollar) BILL_AMT4: Amount of bill
+statement in June, 2005 (NT dollar) BILL_AMT5: Amount of bill statement
+in May, 2005 (NT dollar) BILL_AMT6: Amount of bill statement in April,
+2005 (NT dollar) PAY_AMT1: Amount of previous payment in September, 2005
+(NT dollar) PAY_AMT2: Amount of previous payment in August, 2005 (NT
+dollar) PAY_AMT3: Amount of previous payment in July, 2005 (NT dollar)
+PAY_AMT4: Amount of previous payment in June, 2005 (NT dollar) PAY_AMT5:
+Amount of previous payment in May, 2005 (NT dollar) PAY_AMT6: Amount of
+previous payment in April, 2005 (NT dollar) default.payment.next.month:
+Default payment (1=yes, 0=no)
+
+
+Inicialmente modificamos valores por factores y filtramos NIVEL variables con valores no establecidas en la descrición
+
+```{r excluyendo NIVEL variables registros no identificados en la BD}
+names(df0)
+head(df0)
+
+unique(df0$SEX)
+df0$SEX = factor(df0$SEX, levels = c(1, 2), labels =  c('Hombre','Mujer'))
+
+
+#filtrando el df0 solo con valores reconocidos para la var MARRIAGE
+
+df0$EDUCATION[df0$EDUCATION == 6] = 5
+df0$EDUCATION[df0$EDUCATION == 5] = 4
+df0$EDUCATION[df0$EDUCATION == 0] = 4
+unique(df0$EDUCATION)
+recognized_levels_EDUCATION = c(1, 2, 3, 4)
+df0 = df0[df0$MARRIAGE %in% recognized_levels_EDUCATION, ]
+df0$EDUCATION = factor(df0$EDUCATION, levels = c(1,2,3,4), labels =  c('graduate school', 'university', 'high school', 'others'))
+unique(df0$EDUCATION)
+
+
+
+# MARRIAGE: Marital status (1=married, 2=single, 3=others)
+unique(df0$MARRIAGE)
+recognized_levels_marriage = c(1, 2, 3)
+df0 = df0[df0$MARRIAGE %in% recognized_levels_marriage, ]
+df0$MARRIAGE = factor(df0$MARRIAGE, levels = recognized_levels_marriage, labels =  c('married', 'single', 'divorced'))
+
+
+#FILTRANDO VALORES NO RECONOCIDOS EN COLUMNA PAY
+
+#df0 %>% rename ('PAY_1' = 'PAY_0')
+
+df0 = rename(df0, PAY_1 = PAY_0)
+unique(df0$PAY_1)
+#Se plantea sustituir el -2 por el 0 ya que indican lo mismo, sin pago en el balance del mes
+#df0$PAY_1[df0$PAY_1 == -2] = 0
+df0$PAY_1 = as.factor(df0$PAY_1)
+#df0$PAY_2[df0$PAY_2 == -2] = 0
+df0$PAY_2 = as.factor(df0$PAY_2)
+#df0$PAY_3[df0$PAY_3 == -2] = 0
+df0$PAY_3 = as.factor(df0$PAY_3)
+#df0$PAY_4[df0$PAY_4 == -2] = 0
+df0$PAY_4 = as.factor(df0$PAY_4)
+#df0$PAY_5[df0$PAY_5 == -2] = 0
+df0$PAY_5 = as.factor(df0$PAY_5)
+#df0$PAY_6[df0$PAY_6 == -2] = 0
+df0$PAY_6 = as.factor(df0$PAY_6)
+"
+-2: No consumption; -1: Paid in full; 0: The use of revolving credit; 1 = payment delay for one month; 2 = payment delay for two months; . . .; 8 = payment delay for eight months; 9 = payment delay for nine months and above.
+"
+
+"
+Intentando implementar un bucle
+"
+# for (name in names(df0)) {
+#   if (name %in% c('PAY_0', 'PAY_2', 'PAY_3', 'PAY_4', 'PAY_5'))
+#   {
+#     recognized_levels_pay = c(-1, 1, 2, 3, 4, 5, 6, 7, 8)
+#   df0 = df0[df0[glue('{name}')] %in% recognized_levels_pay, ]
+#   df0[glue('{name}')] = as.factor(df0[glue('{name}')])
+#   }
+# }
+
+
+diferencia_df0_dfbase = dim(dfbase)[1] - dim(df0)[1]
+
+glue('INFORME: Al finalizar los primeros filtrados de valores no especificados de la BD, se eliminaron {diferencia_df0_dfbase} registros de un total de {length(dfbase)}')
+
+```
+
+Todas las variables son explicadas en el siguiente link
+https://www.kaggle.com/datasets/uciml/default-of-credit-card-clients-dataset/discussion/34608
+
+### Conociendo a nuestros sujetos de estudio
+
+```{r}
+names(df0)
+attach(df0)
+# ¿cuántos hombre y mujeres hay en la población y que proporción nos indica del total?
+table(EDUCATION)
+prop.table(table(EDUCATION))
+```
+
+```{r}
+# ¿Cuántos hombres y mujeres hay por nivel educativo y que proporción representan en cada uno?
+table(EDUCATION, SEX)
+prop.table(table(EDUCATION, SEX)) # A NIVEL GLOBAL
+prop.table(table(EDUCATION, SEX), margin = 1) # A NIVEL VARIABLE SEX
+prop.table(table(EDUCATION, SEX), margin = 2) # A NIVEL VARIABLE EDUCACIÓN
+"
+Se reconocen los 4 grupos, por educación, más robustos en la población:
+
+  1) Mujeres en universidad, representando el 28.9% de la población
+    i.Representando el 47.8% del total de mujeres
+  2) Mujeres graduadas, representando el 20.8%
+  3) Hombres en universidad, con el 17.95%
+    i.Representando el 45.28% del total de hombres
+  4) Hombres graduados de universidad con el 14.54%
+"
+
+```
+
+
+```{r}
+# ¿Cuántos hombres y mujeres hay por estado civil casado y que proporción representan en cada uno?
+table(EDUCATION, MARRIAGE)
+prop.table(table(EDUCATION, MARRIAGE)) # A NIVEL GLOBAL
+prop.table(table(EDUCATION, MARRIAGE), margin = 1) # A NIVEL VARIABLE EDUCATIONO
+prop.table(table(EDUCATION, MARRIAGE), margin = 2) # A NIVEL VARIABLE EDUCACIÓN
+
+"
+Por estado civil se pueden el orden de grupos más robustos en la  población:
+  1) Las mujeres solteras que representan un 31.4% de la población
+    i. Representando al 52% de las mujeres
+  2) Las mujeres casadas con un 28.28%
+  3) Los hombres solteros con un 21.87%
+    i. Representando al 55.17% de las mujeres
+  4) Los hombres casados con un 17.33%
+
+Por EDUCATIONo, se tiene más registros de personas solteras
+"
+```
+
+```{r}
+# ¿Cuántos Casados y solteros hay por nivel educativo y que proporción representan en cada uno?
+table(EDUCATION, MARRIAGE)
+prop.table(table(EDUCATION, MARRIAGE)) # A NIVEL GLOBAL
+prop.table(table(EDUCATION, MARRIAGE), margin = 1) # A NIVEL VARIABLE EDUCATION
+prop.table(table(EDUCATION, MARRIAGE), margin = 2) # A NIVEL VARIABLE MARRIAGE
+```
+```{r}
+gg1 = ggplot(df0) +
+  geom_bar(mapping = aes(x=SEX, fill = EDUCATION))
+
+gg2 = ggplot(df0) +
+  geom_bar(mapping = aes(y=EDUCATION, fill = SEX))
+
+gg1 / gg2
+
+```
+```{r}
+
+gg3 = ggplot(df0) +
+  geom_bar(mapping = aes(y=MARRIAGE, fill = SEX))
+
+gg4 = ggplot(df0) +
+  geom_bar(mapping = aes(y=SEX, fill = MARRIAGE))
+
+gg3 / gg4
+
+```
+#Conociendo la edad promedio y la grupación por edad de la población por sexo
+```{r}
+#Densidad
+# ggplot(df0, aes(x=AGE))+
+#   geom_area(aes(y = ..density.., fill=SEX), stat = "bin")
+
+#Conteo
+mu <- ddply(df0, "SEX", summarise, grp.mean=mean(AGE))
+head(mu)
+
+ggplot(df0, aes(x=AGE, fill=SEX)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=SEX),
+             linetype="dashed")+theme(legend.position="bottom")
+```
+
+
+```{r}
+#Densidad
+# ggplot(df0, aes(x=AGE))+
+#   geom_area(aes(y = ..density.., fill=EDUCATION), stat = "bin")
+
+#Conteo
+mu <- ddply(df0, "EDUCATION", summarise, grp.mean=mean(AGE))
+head(mu)
+
+ggplot(df0, aes(x=AGE, fill=EDUCATION)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=EDUCATION),
+             linetype="dashed")+ theme(legend.position="bottom")
+```
+Para hombres
+```{r}
+#Densidad
+# ggplot(df0, aes(x=AGE))+
+#   geom_area(aes(y = ..density.., fill=EDUCATION), stat = "bin")
+
+#Conteo
+mu <- ddply(df0, "EDUCATION", summarise, grp.mean=mean(AGE))
+head(mu)
+
+ggplot(df0[df0$SEX == 'Hombre', ], aes(x=AGE, fill=EDUCATION)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=EDUCATION),
+             linetype="dashed")+ theme(legend.position="bottom")
+```
+
+Para mujeres
+```{r}
+#Densidad
+# ggplot(df0, aes(x=AGE))+
+#   geom_area(aes(y = ..density.., fill=EDUCATION), stat = "bin")
+
+#Conteo
+mu <- ddply(df0[df0$SEX == 'Mujer', ], "EDUCATION", summarise, grp.mean=mean(AGE))
+head(mu)
+
+ggplot(df0[df0$SEX == 2], aes(x=AGE, fill=EDUCATION)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=EDUCATION),
+             linetype="dashed")+ theme(legend.position="bottom")
+```
+
+```{r}
+ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = AGE, fill=SEX))
+```
+
+
+Distribución de el limit bal por edades separado por facetas de grupos educativos
+
+```{r}
+mu <- ddply(df0, "SEX", summarise, grp.mean=mean(LIMIT_BAL))
+head(mu)
+
+ggplot(df0, aes(x=LIMIT_BAL, fill=SEX)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=SEX),
+             linetype="dashed")+ theme(legend.position="bottom")
+```
+
+
+
+```{r}
+#Creando un nuevo df a partir de la variable de interés
+df0_1 = filter(df0, EDUCATION %in% c("university", "graduate school", "high school"))
+mu = ddply(df0_1, "EDUCATION", summarise, grp.mean=mean(LIMIT_BAL))
+head(mu)
+ggplot(df0_1, aes(x=LIMIT_BAL, fill=SEX))+
+  geom_area(stat ="bin")+facet_grid(EDUCATION ~ .) + geom_vline(data=mu, aes(xintercept=grp.mean, color="red"),
+             linetype="dashed")
+```
+
+
+### Mapeando el limit credi bal por sujeto y por variables categoricas
+
+Distribución y concentración en variable categorica del crédito por nivel educativo
+```{r}
+ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=SEX))
+```
+
+
+¿Por qué parece que se tienen más registros de hombres que de mujeres en las ultimas trazas?
+```{r}
+ggplot(df0) +
+  geom_tile(mapping = aes( x= EDUCATION, y = MARRIAGE, fill = LIMIT_BAL))
+```
+
+```{r}
+"
+aqui podriamos establecer correlaciones entre limit bal y marriage and education
+"
+```
+
+```{r}
+ggplot(df0) +
+  geom_raster(mapping = aes( x= EDUCATION, y = MARRIAGE, fill = AGE))
+```
+```{r}
+names(df0)
+```
+
+```{r}
+mu <- ddply(df0, "SEX", summarise, grp.mean=mean(AGE))
+
+head(mu)
+ggplot(df0, aes(x = AGE, fill=EDUCATION)) +
+  geom_histogram() +
+  scale_x_continuous("AGE") +
+  scale_y_continuous("Conteo") +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=SEX),
+             linetype="dashed")+theme(legend.position="bottom")
+```
+
+
+```{r}
+ggplot(df0, aes(x = LIMIT_BAL)) +
+  geom_histogram() +
+  scale_x_continuous("LIMIT_BAL") +
+  scale_y_continuous("Conteo")
+```
+
+```{r}
+ggplot(df0, aes(x = LIMIT_BAL)) +
+  geom_density() +
+  scale_x_continuous("LIMIT_BAL") +
+  scale_y_continuous("Conteo")
+```
+
+### Creando un grafico de pie
+```{r}
+conteos_education = c()
+conteos_education_p = c()
+for (x in unique(df0$EDUCATION)){
+  temp = nrow(filter(df0,EDUCATION == x))
+  if (temp != 0){
+    conteos_education = c(conteos_education, temp)
+  }
+}
+conteos_education_p = c()
+for (x in conteos_education){
+  temp = x / sum(conteos_education) * 100
+  conteos_education_p = c(conteos_education_p, round(temp, 1))
+}
+
+
+df_categ = data.frame(categoria = as.factor(unique(df0$EDUCATION[!is.na(df0$EDUCATION)])), conteo = conteos_education_p)
+ggplot(df_categ,aes(x= "",y = conteo, fill = categoria))+
+	geom_bar(stat = "identity", color = "white")+coord_polar(theta = "y") + geom_text(aes(label = conteos_education_p),
+		position = position_stack(vjust = 0.5), color = "white", size = 3)+ labs(title = "Conteo de individuos por nivel educativo")
+  
+```
+
+## Libreria flex table
+
+```{r}
+library(flextable)
+names(df0)
+
+myft  <-  theme_vader(flextable(head(df0), col_keys =  c("SEX", "EDUCATION", "MARRIAGE", "AGE", "LIMIT_BAL")) )
+
+myft = bold(myft, ~ MARRIAGE == 'married', ~ MARRIAGE, bold = TRUE)
+myft
+```
+
+## Analizando el estatus de pago por mes y por nuestras variables categoricas
+
+Qué sexo tiene mayores retrasos (como factores)?
+Qué nivel educativo tiene mayores retrasos?
+Qué estatus marital tiene mayores retraso?
+
+Se concluye que no importan estas variables demograficas, el comportamiento crediticio que nos muestra las variables PAY_X no varia
+
+## Usando pivot longer para las variables PAY_X y PAY_AMT1
+
+
+EXPLORANDO VARIABLES DISCRETAS VS PAY_X
+```{r}
+#Wide form to long form in discret variable
+df_payments1 = select(df0, ID, SEX, EDUCATION,  MARRIAGE ,PAY_1, PAY_2, PAY_3, PAY_4, PAY_5, PAY_6) %>%
+  pivot_longer(cols = 5:10,
+               names_to = 'PAY_X',
+               values_to = 'REPAYMENT_STATUS')
+
+ggplot(df_payments1) +
+  geom_bar(aes(x=PAY_X, fill=REPAYMENT_STATUS, stat="identity"))
+
+"
+¿Cómo le puedo agregar numeros a cada barra apilada?
+geom_text(aes(label=(..count..)))
+"
+```
+
+```{r}
+ggplot(filter(df_payments1, EDUCATION %in% c("university", "graduate school", "high school"))) +
+  geom_bar(aes(x=PAY_X, fill=REPAYMENT_STATUS, stat="identity"))+
+  facet_grid(EDUCATION ~ .)
+```
+
+```{r}
+ggplot(df_payments1) +
+  geom_bar(aes(x=PAY_X, fill=REPAYMENT_STATUS, stat="identity"))+
+  facet_grid(MARRIAGE ~ .)
+```
+
+
+
+EXPLORANDO VARIABLES DISCRETAS VS PAY_AMTX
+```{r}
+#Wide form to long form in a continuous variable
+
+df_payments2 = select(df0, ID, SEX, EDUCATION,  MARRIAGE, PAY_AMT1, PAY_AMT2, PAY_AMT3, PAY_AMT4, PAY_AMT5, PAY_AMT6) %>% 
+  filter(!is.na(EDUCATION)) %>%
+  pivot_longer(cols = 5:10,
+               names_to = 'PAY_AMT_X',
+               values_to = 'REPAYMENT_STATUS')
+df_payments2 = filter(df_payments2, REPAYMENT_STATUS != 0)
+
+# ggplot(df_payments2, aes(x = REPAYMENT_STATUS)) +
+#   geom_histogram()
+# 
+# ggplot(df_payments2, aes(x = REPAYMENT_STATUS)) +
+#   geom_density()
+
+ggplot(df_payments2, aes( x= EDUCATION, y = MARRIAGE, fill = REPAYMENT_STATUS)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("MONTO PAGADO MES CON MES POR NIVEL EDUCATIVO Y ESTADO CIVIL")
+
+
+#DISTRIBUCIÓN DEL MONTO A PAGAR MES CON MES POR NIVEL EDUCATIVO Y SEXO
+ggplot(df_payments2) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = REPAYMENT_STATUS, fill=SEX))+ theme(plot.title=element_text(size=8))+
+  ggtitle("MONTO PAGADO MES CON MES POR NIVEL EDUCATIVO Y SEXO")
+
+
+
+```
+
+EXPLORANDO VARIABLES DISCRETAS VS BILL_AMTX
+```{r}
+#Wide form to long form in a continuous variable
+
+df_payments3 = df0 %>% select(ID, SEX, EDUCATION, MARRIAGE, BILL_AMT1, BILL_AMT2, BILL_AMT3, BILL_AMT4, BILL_AMT5, BILL_AMT6) %>% 
+  filter(!is.na(EDUCATION)) %>%
+  pivot_longer(cols = 5:10,
+               names_to = 'BILL_STATEMENT',
+               values_to = 'AMOUNT')
+#df_payments3 = filter(df_payments3, AMOUNT != 0)
+
+# ggplot(df_payments3) +
+#   geom_histogram(mapping = aes(x = AMOUNT, fill=SEX))
+
+
+# ggplot(df_payments3) +
+#   geom_histogram(mapping = aes(x = AMOUNT, fill=EDUCATION)) +
+#   facet_grid(SEX ~ .)+
+#   theme(plot.title=element_text(size=10))+
+#   ggtitle("MONTO POR SEXO")
+
+
+#DISTRIBUCIÓN DEL MONTO A PAGAR MES CON MES POR NIVEL EDUCATIVO Y SEXO
+ggplot(df_payments3) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = AMOUNT, fill=SEX))+ theme(plot.title=element_text(size=10))+
+  ggtitle("MONTO A PAGAR MES CON MES POR NIVEL EDUCATIVO Y SEXO")
+
+
+ggplot(df_payments3) +
+  geom_boxplot(mapping = aes(x=MARRIAGE, y = AMOUNT, fill=SEX))+ theme(plot.title=element_text(size=10))+
+  ggtitle("MONTO A PAGAR MES CON MES POR ESTADO CIVIL Y SEXO")
+
+# table(df_payments3$AMOUNT)
+```
+
+
+
+```{r}
+ggplot(df_payments3, aes( x= EDUCATION, y = MARRIAGE, fill = AMOUNT)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("MONTO A PAGAR MES CON MES POR ESTADO CIVIL Y EDUCACION")
+#+geom_text(aes(label = AMOUNT), color = "white", size = 1)
+#+
+#+
+
+# ggplot(df_payments3, aes( x= MARRIAGE, y = SEX, fill = AMOUNT)) +
+#   geom_tile(color = "white",
+#             lwd = 0.1,
+#             linetype = 1)+
+#   guides(fill = guide_colourbar(barwidth = 0.5,
+#                                 barheight = 12))
+
+"
+Se puede apreciar ligeramente una coloración clara en married y graduated school indicando una mayor cantidad a pagar en este grupo
+"
+
+```
+
+
+
+```{r}
+table(df0$default.payment.next.month)
+
+
+#Wide form to long form in a continuous variable
+
+df_payments4 = df0 %>% select(ID, SEX, EDUCATION, MARRIAGE, default.payment.next.month) %>% 
+  filter(!is.na(EDUCATION))
+
+ggplot(df_payments4, aes( x= EDUCATION, y = MARRIAGE, fill = default.payment.next.month)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("default.payment.next.month")
+
+"Que nos indica la graf anterior?"
+```
+
+
+
+
+#Sacando la net difference entre meses
+```{r}
+
+unique(df0$EDUCATION)
+net_differences_bymonths = df0 %>% 
+  mutate(ND_1 = BILL_AMT1-PAY_AMT1, ND_2 = BILL_AMT2 - PAY_AMT2, ND_3 = BILL_AMT3 - PAY_AMT3, ND_4 = BILL_AMT4 - PAY_AMT4, ND_5 = BILL_AMT5 - PAY_AMT5, ND_6 = BILL_AMT6 - PAY_AMT6) %>% select(ID, SEX, MARRIAGE, AGE, EDUCATION, LIMIT_BAL, PAY_1, PAY_AMT1, BILL_AMT1, ND_1, PAY_2, PAY_AMT2, BILL_AMT2, ND_2, PAY_3, PAY_AMT3, BILL_AMT3, ND_3, PAY_4, PAY_AMT4, BILL_AMT4, ND_4, PAY_5, PAY_AMT5, BILL_AMT5, ND_5, PAY_6, PAY_AMT6, BILL_AMT6, ND_6, default.payment.next.month)
+
+net_differences_bymonths
+"
+-2: No consumption; -1: Paid in full; 0: The use of revolving credit; 1 = payment delay for one month; 2 = payment delay for two months; . . .; 8 = payment delay for eight months; 9 = payment delay for nine months and above.
+"
+
+"
+Una opinión en una discusión ofrece este otro vistazo de algunos de los valores que pueden tomar la variable PAY_X
+-2 = Balance paid in full and no transactions this period (we may refer to this credit card account as having been 'inactive' this period)
+
+-1 = Balance paid in full, but account has a positive balance at end of period due to recent transactions for which payment has not yet come due
+
+0 = Customer paid the minimum due amount, but not the entire balance. I.e., the customer paid enough for their account to remain in good standing, but did revolve a balance
+"
+```
+Generando perfiles de consumidor:
+
+Podriamos describir el comportamiento de los clientes que no consumieron en ese periodo [perfil 1], los clientes que consumieron y pagaron lo necesario para no generar intereses [perfil 2], los clientes que consumieron y dieron el pago minimo que siempre genera intereses [perfil 3], y finalmente los clientes que entran en cartera vencida [perfil 4] (1-3), como los que entran en cartera morosa (4-..., con retrasos mayores a 90 días como le estandar bancario lo establece) [perfil 5]
+
+
+EL perfil del consumidor estará definido por la moda del estatus de pago (repayment status) a lo largo de los 6 meses
+
+
+```{r}
+#Creando una función que saque la moda de las variables que catalogan el estado del pago del mes (repayment status)
+mode_function = function(x){
+x = as.numeric(as.character(x)) # Cambia a numérico sin cambiar los valores
+r = as.numeric(names(which.max(table(x)))[1]) # Primer numero con mayor frecuencia
+return(r)
+}
+
+net_differences_bymonths_pay = net_differences_bymonths %>% select(PAY_1, PAY_2, PAY_3, PAY_4, PAY_5, PAY_6)
+net_differences_bymonths$CLIENT_PROFILE = apply(net_differences_bymonths_pay[,-1], 1, mode_function)
+net_differences_bymonths$CLIENT_PROFILE = as.factor(net_differences_bymonths$CLIENT_PROFILE)
+
+
+```
+
+
+#Mapeando el limit bal de cada perfil
+
+```{r}
+
+mu <- ddply(net_differences_bymonths, "CLIENT_PROFILE", summarise, grp.mean=mean(LIMIT_BAL))
+head(mu)
+
+ggplot(net_differences_bymonths, aes(x=LIMIT_BAL, fill=SEX)) +
+  geom_area(stat ="bin", alpha=0.6)+
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean),
+             linetype="dashed")+ theme(legend.position="bottom")+
+  facet_grid(CLIENT_PROFILE ~ .)
+```
+
+```{r}
+ggplot(net_differences_bymonths) +
+  geom_boxplot(mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=15))+
+  ggtitle("Distribución del limite crediticio por perfil del cliente y por sexo")
+```
+
+```{r}
+ggplot(net_differences_bymonths) +
+  geom_boxplot(mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=EDUCATION))+ theme(plot.title=element_text(size=14))+
+  ggtitle("Distribución del limite crediticio por perfil del cliente y por educación")
+```
+
+
+```{r}
+ggplot(net_differences_bymonths) +
+  geom_bar(mapping = aes(x=CLIENT_PROFILE, fill=SEX))+ theme(plot.title=element_text(size=15))+
+  ggtitle("Perfil del cliente por sexo")
+```
+
+```{r}
+
+unique(net_differences_bymonths$EDUCATION)
+ggplot(net_differences_bymonths, aes( x= CLIENT_PROFILE, y = EDUCATION, fill = LIMIT_BAL)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("Limite crediticio por perfil y nivel educativo")
+```
+
+
+Sacando quantiles del limit bal por tipo de perfil del cliente dado por la moda del estatus de pago a lo largo de los 6 meses
+
+Sacando un box plot con el mismo ejercicio
+```{r}
+
+```
+
+
+
+
+Sacando correlaciones entre:
+
+- El perfil del cliente dado por la moda del estatus de pago a lo largo de los 6 meses y el limit bal.
+- Educación y el limit bal
+- Sexo y el limit bal
+- Estado civil y el limit bal
+
+-Limit bal y nivel educativo (generar grafica también)
+-Gasto promedio mensual y nivel educativo (generar grafica también)
+- GPM y sexo (generar grafica también)
+- GPM y perfil del cliente (generar grafica también)
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APARTADO DE CONCLUSIONES:
+
+
+- Parece ser que aunque los grupos delimitados por educacion, sexo y estado civil, tienen diferentes topes de credito, unos con mayor limite, a excepción de los outliers todos se endeudan en la misma cantidad y pagan la misma cantidad
