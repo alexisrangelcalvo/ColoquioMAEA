@@ -1,0 +1,183 @@
+---
+title: "Análisis estadístico"
+subtitle: "Comportamiento crediticio de 30 mil usuarios en Taiwan para el año 2005"
+author: "Alexis Rangel"
+date: "2022-12-04"
+output:
+  xaringan::moon_reader:
+    css: 
+      css/stylesheet.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      navigation: 
+        scroll: false
+---
+
+
+
+
+name: about-me
+layout: false
+class: about-me-slide, middle, center
+background-color: var(--DarkRed)
+
+# About me
+
+<img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/92005917?v=4.png" width="250px"/>
+s
+## Alexis Rangel Calvo
+#### Lic en economía y programador jr
+
+.fade[Propedeutico MAEA FACE UJED]
+
+[`r fontawesome::fa("twitter", a11y = "sem")` @alexrangelcalvo](https://mobile.twitter.com/alexrangelcalvo)
+[`r fontawesome::fa("github", a11y = "sem")` @alexisrangelcalvo](https://github.com/alexisrangelcalvo)
+
+
+
+
+---
+### Planteamiento del problema
+
+<div style="text-align: justify">Las entidades  financieras  y bancarias, como parte de su operación díaria, se encuentran lidiando y mitigando los riesgos financieros inherentes a cada operación crediticia que implica incertidumbre y que, por tanto, puede ocasionar alguna consecuencia financiera negativa para la organización.  <div/>
+<Br>
+
+<div style="text-align: justify">Dentro de estas organizaciones, los datos históricos del comportamiento crediticio de sus clientes y todo el procesamiento como modelado que se pueda hacer con estos, representan una fuente de información valiosa para la toma de decisiones directiva del día a día.<div/>
+<Br>
+
+<div style="text-align: justify"> <span id = "myspan"> Para dar un primer acercamiento a estos complejos procesos, y como problema a resolver, se planteo un análisis estadístico **descriptivo** de 30 mil registros relativos al comportamiento de usuarios de tarjetas de crédito en Taiwan para los meses de abril del 2005 a septiembre del mismo año.<span/> <div/>
+<Hr>
+---
+###Objetivo general
+
+<div style="text-align: justify">Describir el comportamiento de los usuarios de tarjetas de crédito, luego de una clasificación por tipo de perfil de cliente basado en el consumo-pago de la linea de crédito mes con mes, y establecer correlaciones simples entre las variables disponibles, especialmente situando a la variable de limite de crédito como foco de atención, para plantear hipótesis de la muestra estudiada.<div/>
+
+
+<Hr>
+
+###Objetivos particulares
+
+* Tratamiento, limpieza de datos y exclusión de registros de clientes con datos incompletos que no permitan su estudio.
+
+* Establecer perfiles de consumo con base en su comportamiento **consumo-pago** de la linea de crédito.
+* GGenerar gráficos descriptivos del comportamiento financiero de los usuarios.
+
+* Establecer correlaciones y plantear hipótesis de la muestra estudiada.
+<Hr>
+
+---
+###Limitaciones
+
+Ninguna, los limites estan en la mente.
+
+---
+
+###Marco teórico
+
+<div style="text-align: justify">**Riesgo financiero:** Cualquier actividad empresarial que implica incertidumbre y que, por tanto, pueda ocasionar alguna consecuencia financiera negativa para la organización.<div/> 
+<Br>
+
+|Tipo de riesgo | Definición|
+:------------: | :----------------
+|Crédito   | <div style="text-align: justify">Considerado por las entidades bancarias como la probabilidad de impago del prestatario o el incumplimiento de las condiciones pactadas del contrato.<div/> |
+|Tipo de interés       | <div style="text-align: justify">Implicito a la naturaleza del negocio bancario, movimientos ascendentes o descendentes de la tasa de interés activa o pasiva incidiran en el crédito<div/>|
+|Liquidez | Se refiere a que el banco no pueda satisfacer la demanda de dinero ante una eventualidad como la retirada masiva de los depositos.|
+|Mercado | Se origina como consecuencia de los movimientos que afectan el valor de la cartera de inversión y negociación de la entidad.|
+|Operativo | <div style="text-align: justify">Surge como consecuencia del mal funcionamiento de los sitemas de control y gestion de la entidad 8sistemas informáticos, errores humanos, entre otros.)<div/> |
+|Reputación | <div style="text-align: justify">El deterioro de la imagen del banco ante los clientes por publicidad negativa<div/> |
+Tabla 1: Tipos de riesgos financieros en el negocio bancario.
+
+Fuente: Ruza & Curbera (2013)
+
+---
+###Marco teórico
+
+<div style="text-align: justify">**Definiendo perfiles de clientes:** La variable PAY_X (1:6) define el estatus del pago de septiembre a abril en orden inverso. Cada mes se generá este estatus de pago al evaluar la variable BILL_AMTX (1:6), que es la cantidad a pagar en el mes, contra la variable PAY_AMT1, que es la cantidad pagada por el usuario en el mes.<div/>
+
+
+
+En la documentación de la propia base se establecen el significado para cada estatus de pago:
++ -2 indica no consumo en el periodo (que no se utilizó la TC)
++ -1 indica que el saldo de la TC fue pagado en su totalidad.
++ 0  indica que se uso un crédito revolvente (se pagó el mínimo para no generar intereses, pero no se liquido el crédito)
++ 1 indica que el  pago esta retrasado por un mes (30 días)
++ 2 indica que el pago esta retrasado por dos meses (60 días)
++ 3 indica que el pago esta retrasado por dos meses (90 días)
++ …
++ 9 indica que el pago esta retrasado por nueve meses o más (>= 270 días)
+
+---
+###Marco teórico
+
+<div style="text-align: justify">Debido a que un promedio de los 6 meses no parece viable, para sacar un perfil de consumidor en los 6 meses para cada usuario, se opto por usar la moda con la siguiente función elaborada (dada la inexistencia de esta en el software R) como medida de tendencia central que segmentara entre grupos:<div/>
+
+```{r}
+#Quizás no sea necesaria esta diapo
+mode_function = function(x){
+x = as.numeric(as.character(x)) # Cambia a numérico sin cambiar los valores
+r = as.numeric(names(which.max(table(x)))[1]) # Primer numero con mayor frecuencia
+return(r)
+}
+```
+<Hr>
+---
+###Metodología:
+<div style="text-align: justify">El análisis se acota en el campo cuantitativo, de tipo descriptivo, con un diseño no experimental longitudinal de tendencia. La población estuvo conformada por 30 mil registros de usuarios de tarjetas de crédito en Taiwan para el periodo de abril a septiembre (6 meses) del 2005.<div/>
+<Hr>
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+# For viewer xaringan::inf_mr() outside of the chunk
+
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```{r panel-chunk, echo=TRUE}
+# ... r code ...
+choose(5,2)
+```
+]
+
+.panel[.panel-name[Plot]
+
+![](README_files/figure-gfm/panel-chunk-1.png)
+]
+
+.panel[.panel-name[PlotR]
+
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+plot(1:19)
+#adjust plot
+
+#https://xaringan.gallery/examples/full-screen-plot/
+```
+
+]
+]
+
+---
+###Referencias:
+
+* Ruza, C. & Curbera, P. (2013). El riesgo de crédito en perspectiva. Madrid. Ediciones Universidad
+Nacional de estudios a distancias.
+
+
+---
+
+
+
+
+
+
+
+
+
