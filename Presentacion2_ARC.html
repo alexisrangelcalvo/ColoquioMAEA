@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Análisis estadístico</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Alexis Rangel" />
+    <meta name="date" content="2022-12-07" />
+    <script src="Presentacion2_ARC_files/header-attrs-2.16/header-attrs.js"></script>
+    <link href="Presentacion2_ARC_files/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="Presentacion2_ARC_files/panelset-0.2.6/panelset.js"></script>
+    <link href="Presentacion2_ARC_files/tabwid-1.1.2/tabwid.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/stylesheet.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Análisis estadístico
+]
+.author[
+### Alexis Rangel
+]
+.date[
+### 2022-12-07
+]
+
+---
+
+name: about-me
+layout: false
+class: about-me-slide, middle, center
+background-color: var(--DarkRed)
+
+# About me
+
+&lt;img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/92005917?v=4.png" width="250px"/&gt;
+s
+## Alexis Rangel Calvo
+#### Lic en economía y programador jr
+
+.fade[Propedeutico MAEA FACE UJED]
+
+[<svg aria-label="Twitter" role="img" viewBox="0 0 512 512" style="height:1em;width:1em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><title>Twitter</title><path d="M459.4 151.7c.325 4.548 .325 9.097 .325 13.65 0 138.7-105.6 298.6-298.6 298.6-59.45 0-114.7-17.22-161.1-47.11 8.447 .974 16.57 1.299 25.34 1.299 49.06 0 94.21-16.57 130.3-44.83-46.13-.975-84.79-31.19-98.11-72.77 6.498 .974 12.99 1.624 19.82 1.624 9.421 0 18.84-1.3 27.61-3.573-48.08-9.747-84.14-51.98-84.14-102.1v-1.299c13.97 7.797 30.21 12.67 47.43 13.32-28.26-18.84-46.78-51.01-46.78-87.39 0-19.49 5.197-37.36 14.29-52.95 51.65 63.67 129.3 105.3 216.4 109.8-1.624-7.797-2.599-15.92-2.599-24.04 0-57.83 46.78-104.9 104.9-104.9 30.21 0 57.5 12.67 76.67 33.14 23.72-4.548 46.46-13.32 66.6-25.34-7.798 24.37-24.37 44.83-46.13 57.83 21.12-2.273 41.58-8.122 60.43-16.24-14.29 20.79-32.16 39.31-52.63 54.25z"/></svg> @alexrangelcalvo](https://mobile.twitter.com/alexrangelcalvo)
+[<svg aria-label="GitHub" role="img" viewBox="0 0 496 512" style="height:1em;width:0.97em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><title>GitHub</title><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3 .3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5 .3-6.2 2.3zm44.2-1.7c-2.9 .7-4.9 2.6-4.6 4.9 .3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3 .7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3 .3 2.9 2.3 3.9 1.6 1 3.6 .7 4.3-.7 .7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3 .7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3 .7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> @alexisrangelcalvo](https://github.com/alexisrangelcalvo)
+
+---
+### Planteamiento del problema
+
+&lt;div style="text-align: justify"&gt;Las entidades  financieras  y bancarias, como parte de su operación díaria, se encuentran lidiando y mitigando los riesgos financieros inherentes a cada operación crediticia que implica incertidumbre y que, por tanto, puede ocasionar alguna consecuencia financiera negativa para la organización.  &lt;div/&gt;
+&lt;Br&gt;
+
+&lt;div style="text-align: justify"&gt;Dentro de estas organizaciones, los datos históricos del comportamiento crediticio de sus clientes y todo el procesamiento como modelado que se pueda hacer con estos, representan una fuente de información valiosa para la toma de decisiones directiva del día a día.&lt;div/&gt;
+&lt;Br&gt;
+
+&lt;div style="text-align: justify"&gt; &lt;span id = "myspan"&gt; Para dar un primer acercamiento a estos complejos procesos, y como problema a resolver, se planteo un análisis estadístico **descriptivo** de 30 mil registros relativos al comportamiento de usuarios de tarjetas de crédito en Taiwan para los meses de abril del 2005 a septiembre del mismo año.&lt;span/&gt; &lt;div/&gt;
+&lt;Hr&gt;
+---
+
+###Objetivo general
+
+&lt;div style="text-align: justify"&gt;Describir el comportamiento de los usuarios de tarjetas de crédito, luego de una clasificación por tipo de perfil de cliente basado en el consumo-pago de la linea de crédito mes con mes, y establecer correlaciones simples entre las variables disponibles, especialmente situando a la variable de limite de crédito como foco de atención, para plantear hipótesis de la muestra estudiada.&lt;div/&gt;
+
+
+&lt;Hr&gt;
+
+###Objetivos particulares
+
+* Tratamiento, limpieza de datos y exclusión de registros de clientes con datos incompletos que no permitan su estudio.
+
+* Establecer perfiles de consumo con base en su comportamiento **consumo-pago** de la linea de crédito.
+* GGenerar gráficos descriptivos del comportamiento financiero de los usuarios.
+
+* Establecer correlaciones y plantear hipótesis de la muestra estudiada.
+&lt;Hr&gt;
+
+---
+###Limitaciones
+
+Ninguna, los limites estan en la mente.
+
+---
+
+###Marco teórico
+
+&lt;div style="text-align: justify"&gt;**Riesgo financiero:** Cualquier actividad empresarial que implica incertidumbre y que, por tanto, pueda ocasionar alguna consecuencia financiera negativa para la organización.&lt;div/&gt; 
+&lt;Br&gt;
+
+|Tipo de riesgo | Definición|
+:------------: | :----------------
+|Crédito   | &lt;div style="text-align: justify"&gt;Considerado por las entidades bancarias como la probabilidad de impago del prestatario o el incumplimiento de las condiciones pactadas del contrato.&lt;div/&gt; |
+|Tipo de interés       | &lt;div style="text-align: justify"&gt;Implicito a la naturaleza del negocio bancario, movimientos ascendentes o descendentes de la tasa de interés activa o pasiva incidiran en el crédito&lt;div/&gt;|
+|Liquidez | Se refiere a que el banco no pueda satisfacer la demanda de dinero ante una eventualidad como la retirada masiva de los depositos.|
+|Mercado | Se origina como consecuencia de los movimientos que afectan el valor de la cartera de inversión y negociación de la entidad.|
+|Operativo | &lt;div style="text-align: justify"&gt;Surge como consecuencia del mal funcionamiento de los sitemas de control y gestion de la entidad 8sistemas informáticos, errores humanos, entre otros.)&lt;div/&gt; |
+|Reputación | &lt;div style="text-align: justify"&gt;El deterioro de la imagen del banco ante los clientes por publicidad negativa&lt;div/&gt; |
+Tabla 1: Tipos de riesgos financieros en el negocio bancario.
+
+Fuente: Ruza &amp; Curbera (2013)
+
+---
+###Marco teórico
+
+&lt;div style="text-align: justify"&gt;**Definiendo perfiles de clientes:** La variable PAY_X (1:6) define el estatus del pago de septiembre a abril en orden inverso. Cada mes se generá este estatus de pago al evaluar la variable BILL_AMTX (1:6), que es la cantidad a pagar en el mes, contra la variable PAY_AMT1, que es la cantidad pagada por el usuario en el mes.&lt;div/&gt;
+
+
+
+En la documentación de la propia base se establecen el significado para cada estatus de pago:
++ -2 indica no consumo en el periodo (que no se utilizó la TC)
++ -1 indica que el saldo de la TC fue pagado en su totalidad.
++ 0  indica que se uso un crédito revolvente (se pagó el mínimo para no generar intereses, pero no se liquido el crédito)
++ 1 indica que el  pago esta retrasado por un mes (30 días)
++ 2 indica que el pago esta retrasado por dos meses (60 días)
++ 3 indica que el pago esta retrasado por dos meses (90 días)
++ …
++ 9 indica que el pago esta retrasado por nueve meses o más (&gt;= 270 días)
+
+---
+
+###Marco teórico
+
+&lt;div style="text-align: justify"&gt;Debido a que un promedio de los 6 meses no parece viable, para sacar un perfil de consumidor en los 6 meses para cada usuario, se opto por usar la moda con la siguiente función elaborada (dada la inexistencia de esta en el software R) como medida de tendencia central que segmentara entre grupos:&lt;div/&gt;
+
+
+```r
+#Quizás no sea necesaria esta diapo
+mode_function = function(x){
+x = as.numeric(as.character(x)) # Cambia a numérico sin cambiar los valores
+r = as.numeric(names(which.max(table(x)))[1]) # Primer numero con mayor frecuencia
+return(r)
+}
+
+#xaringan::inf_mr()
+```
+
+xaringan::inf_mr()
+---
+###Metodología:
+&lt;div style="text-align: justify"&gt;El análisis se acota en el campo cuantitativo, de tipo descriptivo, con un diseño no experimental longitudinal de tendencia. La población estuvo conformada por 30 mil registros de usuarios de tarjetas de crédito en Taiwan para el periodo de abril a septiembre (6 meses) del 2005.&lt;div/&gt;
+&lt;Hr&gt;
+
+---
+
+
+
+
+
+
+
+
+
+####Conociendo a la población de estudio-subtitle
+
+
+
+
+
+---
+
+.panelset[
+.panel[.panel-name[Plot]
+
+&lt;img src="Presentacion2_ARC_files/figure-html/panel-chunk-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.panel[.panel-name[Interpretación]
+
+**Aquí ira una breve interpretación de la anterior gráfica**
+
+]
+
+.panel[.panel-name[R Code]
+
+
+```r
+gg2 = ggplot(df0) +
+  geom_bar(mapping = aes(y=EDUCATION, fill = SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Agrupación de nivel educativo por sexo") 
+```
+
+
+```r
+mu &lt;- ddply(df0, "EDUCATION", summarise, grp.mean=mean(AGE))
+ggarea1 = ggplot(df0, aes(x=AGE, fill=EDUCATION)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=EDUCATION),
+             linetype="dashed")+ theme(legend.position="bottom")
+```
+
+
+]
+]
+&lt;!-- cerrando diapositiva panel set 1 --&gt;
+
+&lt;!-- abriendo diapositiva panel set 2--&gt;
+---
+.panelset[
+.panel[.panel-name[Plot]
+
+
+
+&lt;img src="Presentacion2_ARC_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.panel[.panel-name[Interpretación]
+
+**Aquí ira una breve interpretación de la anterior tabla**
+
+]
+
+.panel[.panel-name[R Code]
+
+
+
+
+```r
+gg3 = ggplot(df0) +
+  geom_bar(mapping = aes(y=MARRIAGE, fill = SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Agrupación de estado civil por sexo")
+```
+
+
+```r
+mu &lt;- ddply(df0, "EDUCATION", summarise, grp.mean=mean(AGE))
+
+ggarea1 = ggplot(df0, aes(x=AGE, fill=EDUCATION)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=EDUCATION),
+             linetype="dashed")+ theme(legend.position="bottom")
+```
+
+]
+]
+
+---
+&lt;!-- cerrando diapositiva panel set 2 --&gt;
+
+&lt;!-- abriendo diapositiva panel set 3--&gt;
+.panelset[
+.panel[.panel-name[Flextable]
+
+
+
+&lt;template id="976f499f-5e4d-4a44-929e-97ecc7211aba"&gt;&lt;style&gt;
+.tabwid table{
+  border-spacing:0px !important;
+  border-collapse:collapse;
+  line-height:1;
+  margin-left:auto;
+  margin-right:auto;
+  border-width: 0;
+  border-color: transparent;
+  caption-side: top;
+}
+.tabwid-caption-bottom table{
+  caption-side: bottom;
+}
+.tabwid_left table{
+  margin-left:0;
+}
+.tabwid_right table{
+  margin-right:0;
+}
+.tabwid td, .tabwid th {
+    padding: 0;
+}
+.tabwid a {
+  text-decoration: none;
+}
+.tabwid thead {
+    background-color: transparent;
+}
+.tabwid tfoot {
+    background-color: transparent;
+}
+.tabwid table tr {
+background-color: transparent;
+}
+.katex-display {
+    margin: 0 0 !important;
+}
+&lt;/style&gt;&lt;div class="tabwid"&gt;&lt;style&gt;.cl-8ddddd28{}.cl-8dd79c9c{font-family:'DejaVu Sans';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(223, 223, 223, 1.00);background-color:transparent;}.cl-8dd79ca6{font-family:'DejaVu Sans';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(223, 223, 223, 1.00);background-color:transparent;}.cl-8dda4bb8{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-8dda59b4{width:0.75in;background-color:rgba(36, 36, 36, 1.00);vertical-align: middle;border-bottom: 3pt solid rgba(255, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8dda59be{width:0.75in;background-color:rgba(36, 36, 36, 1.00);vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}&lt;/style&gt;&lt;table class='cl-8ddddd28'&gt;&lt;thead&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;th class="cl-8dda59b4"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79c9c"&gt;variables&lt;/span&gt;&lt;/p&gt;&lt;/th&gt;&lt;th class="cl-8dda59b4"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79c9c"&gt;married&lt;/span&gt;&lt;/p&gt;&lt;/th&gt;&lt;th class="cl-8dda59b4"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79c9c"&gt;single&lt;/span&gt;&lt;/p&gt;&lt;/th&gt;&lt;th class="cl-8dda59b4"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79c9c"&gt;divorced&lt;/span&gt;&lt;/p&gt;&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;graduate school&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;12.4%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;22.7%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;0.2%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;university&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;22.8%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;23.4%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;0.5%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;high school&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;9.6%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;6.4%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;0.3%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;others&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;0.8%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;0.8%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-8dda59be"&gt;&lt;p class="cl-8dda4bb8"&gt;&lt;span class="cl-8dd79ca6"&gt;0.0%&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/template&gt;
+&lt;div class="flextable-shadow-host" id="b2afbcc8-3f86-4a06-ab2a-eba6f647c2d6"&gt;&lt;/div&gt;
+&lt;script&gt;
+var dest = document.getElementById("b2afbcc8-3f86-4a06-ab2a-eba6f647c2d6");
+var template = document.getElementById("976f499f-5e4d-4a44-929e-97ecc7211aba");
+var fantome = dest.attachShadow({mode: 'open'});
+var templateContent = template.content;
+fantome.appendChild(templateContent);
+&lt;/script&gt;
+]
+
+.panel[.panel-name[Interpretación]
+
+**Aquí ira una breve interpretación de la anterior tabla**
+
+]
+
+.panel[.panel-name[R Code]
+
+
+```r
+propGlob = apply(
+  prop.table(table(df0$EDUCATION, df0$MARRIAGE))*100,
+  2,
+  function(u) sprintf( "%.1f%%", u )
+)
+```
+
+
+```r
+propGlob_f = propGlob %&gt;% as.data.frame.matrix() %&gt;% mutate(variables = c("graduate school", "university", "high school", "others")) %&gt;% select(variables, married, single, divorced) %&gt;% flextable(col_keys =  c("variables","married", "single", "divorced")) %&gt;% theme_vader()
+```
+]
+]
+
+&lt;!-- cerrando diapositiva panel set 3 --&gt;
+
+
+&lt;!-- diapo-slide perfiles --&gt;
+---
+
+---
+
+&lt;!-- inicianod analsiis de perfiles --&gt;
+
+---
+.panelset[
+.panel[.panel-name[PLot]
+
+
+
+&lt;img src="Presentacion2_ARC_files/figure-html/unnamed-chunk-15-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.panel[.panel-name[Interpretación]
+
+**Aquí ira una breve interpretación de la anterior tabla**
+
+]
+
+.panel[.panel-name[R Code]
+
+
+```r
+ggagebp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = AGE, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución de la edad por nivel educativo y sexo")
+```
+
+
+```r
+gglimbp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución del crédito máximo por nivel educativo y sexo")
+```
+]
+]
+
+---
+
+
+
+
+
+
+
+## Análisis de perfiles
+&lt;img src="Presentacion2_ARC_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+
+---
+&lt;img src="Presentacion2_ARC_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="Presentacion2_ARC_files/figure-html/unnamed-chunk-22-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

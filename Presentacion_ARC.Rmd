@@ -126,12 +126,14 @@ return(r)
 ###Metodología:
 <div style="text-align: justify">El análisis se acota en el campo cuantitativo, de tipo descriptivo, con un diseño no experimental longitudinal de tendencia. La población estuvo conformada por 30 mil registros de usuarios de tarjetas de crédito en Taiwan para el periodo de abril a septiembre (6 meses) del 2005.<div/>
 <Hr>
----
 
+xaringan::inf_mr()
+
+---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 # For viewer xaringan::inf_mr() outside of the chunk
-
+library(ggplot2)
 ```
 
 ```{r xaringan-panelset, echo=FALSE}
@@ -165,17 +167,58 @@ plot(1:19)
 ]
 
 ---
-###Referencias:
-
-* Ruza, C. & Curbera, P. (2013). El riesgo de crédito en perspectiva. Madrid. Ediciones Universidad
-Nacional de estudios a distancias.
-
+###Describiendo a la población de estudio
 
 ---
 
 
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+gg2 = gg2 + theme(plot.title=element_text(size=10))+
+ ggtitle("Agrupación de nivel educativo por sexo") 
+
+gg2 / gg3 + theme(plot.title=element_text(size=10))+
+ ggtitle("Agrupación de estado civil por sexo")
+```
+---
+
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+ggagebp / gglimbp
+
+```
+
+---
+###Segmentando por perfiles de consumidores
+---
+
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+ggperf1
+```
 
 
+---
+
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+gglimbp2
+```
+
+---
+
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+gglimbp3
+```
+
+
+---
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+ggrast1
+```
+
+
+---
+###Referencias:
+
+* Ruza, C. & Curbera, P. (2013). El riesgo de crédito en perspectiva. Madrid. Ediciones Universidad
+Nacional de estudios a distancias.
 
 
 

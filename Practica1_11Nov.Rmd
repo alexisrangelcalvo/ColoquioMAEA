@@ -1,0 +1,166 @@
+---
+title: "Practica_1(11_nov)"
+author: "Alexis Rangel"
+date: "2022-11-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+setwd("~/Maestria/Curso propedeutico/coloquio/ColoquioMAEA") 
+#estableciendo directorio
+library(readr)
+library(ggplot2)
+library(tidyr)
+library(readxl)
+library(dplyr)
+library(magrittr)
+library(glue)
+library(plyr)
+library(patchwork) #for subplots
+library(plotly)#file.choose()
+library(corrplot)
+ruta_db = "./DBS/Default of Credit Card Clients Dataset/UCI_Credit_Card.csv"
+
+df0 = read.csv(ruta_db)
+dfbase = read.csv(ruta_db)
+```
+
+
+```{r excluyendo NIVEL variables registros no identificados en la BD}
+names(df0)
+head(df0)
+
+unique(df0$SEX)
+df0$SEX = factor(df0$SEX, levels = c(1, 2), labels =  c('Hombre','Mujer'))
+
+
+#filtrando el df0 solo con valores reconocidos para la var MARRIAGE
+recognized_levels_EDUCATION = c(1, 2, 3, 4, 5, 6)
+df0 = df0[df0$MARRIAGE %in% recognized_levels_EDUCATION, ]
+df0$EDUCATION = factor(df0$EDUCATION, levels = c(1,2,3,4,5,6), labels =  c('graduate school', 'university', 'high school', 'others', 'unknown', 'unknown2'))
+unique(df0$EDUCATION)
+
+# MARRIAGE: Marital status (1=married, 2=single, 3=others)
+unique(df0$MARRIAGE)
+recognized_levels_marriage = c(1, 2, 3)
+df0 = df0[df0$MARRIAGE %in% recognized_levels_marriage, ]
+df0$MARRIAGE = factor(df0$MARRIAGE, levels = recognized_levels_marriage, labels =  c('married', 'single', 'others'))
+
+diferencia_df0_dfbase = dim(dfbase)[1] - dim(df0)[1]
+
+glue('INFORME: Al finalizar los primeros filtrados de valores no especificados de la BD, se eliminaron {diferencia_df0_dfbase} registros de un total de {length(dfbase)}')
+```
+
+
+```{r}
+names(df0)
+```
+
+```{r}
+#Ordenando un df con base en una columna de este, (de forma ascendente y descendente)
+df_tosort = df0
+df_tosort[with(df_tosort, order(LIMIT_BAL)), ]
+df_tosort[with(df_tosort, order(-LIMIT_BAL)), ]
+
+# función sort
+sort(df0$LIMIT_BAL, decreasing = TRUE)
+```
+
+Diferencias entre función SORT y función ORDER
+```{r}
+
+v <- c(34, 47, 25, 14)
+order(v)
+order(v, decreasing = TRUE)  
+#Parece ser que la función order te da las posiciones indexadas del vector por orden, si se desea acomodar de menor a mayor (o de mayor a menor con decreasing = TRUE)
+
+
+#Parece ser que la función SORT te devuelve el vector ordenado de menor a mayor (de mayor a menor con un decreasing = TRUE)
+sort(v)
+sort(v, decreasing = TRUE)
+
+#Se puede solicitar ordenar un vector de acuerdo al orden de otro vector
+v2 = c(4,3,2,1)
+v[order(v2)]
+
+#Ordenar un dataframe
+df0_1 = df0
+df0_1[order(df0_1$LIMIT_BAL, decreasing = TRUE), ]
+
+#Otra opción para ordenar un dataframe
+df0_1[with(df0_1, order(-LIMIT_BAL)), ]
+
+#Para que funciona la función with?
+
+
+```
+
+
+```{r}
+names(df0)
+```
+```{r}
+gg1 = ggplot(df0)+
+  geom_bar(mapping = aes(x=SEX, fill=EDUCATION)); gg1
+```
+
+
+```{r}
+gg2 = ggplot(df0, aes(x=AGE, fill=SEX))+
+  geom_area(stat ="bin", alpha=0.6); gg2
+```
+
+```{r}
+shapiro.test(df0_2$LIMIT_BAL[1:3000])
+```
+
+
+```{r}
+df0_2 = select(df0, c("AGE", "LIMIT_BAL", "BILL_AMT1")); df0_2
+
+#corrplot(cor(df0_2, method = "ellipse"))
+corre1 = cor(df0_2);corre1
+corrplot(corre1, method = "ellipse")
+
+cor(df0_2) %>% corrplot(method = "ellipse")
+```
+
+
+```{r}
+movies <- c("SPYDERMAN","BATMAN","VERTIGO","CHINATOWN")
+movies_lower <-lapply(movies, tolower); movies_lower
+str(movies_lower)
+```
+
+```{r}
+f <- function(val) 
+{
+  if (is.na(val)) {return(2)}
+  else {return(val * 2)}
+}
+f(2)
+```
+
+```{python}
+def f(val):
+  if val is None:
+    return 2
+  else:
+    return val*2
+  
+f(2)
+```
+
+Repasar:
+- bucles for y while en r (Estructuras de control)
+- apply, lapply y sapply en r

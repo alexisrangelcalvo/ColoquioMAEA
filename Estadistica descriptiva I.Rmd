@@ -24,7 +24,6 @@ https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf
 http://www.sthda.com/english/wiki/ggplot2-area-plot-quick-start-guide-r-software-and-data-visualization
 * DATAVIZ GEOM AREA
 
-
 INICIANDO LA ESTADISTICA DESCRIPTIVA Y ANALISIS DE DATOS DE LA BASE DE DATOS
 
 ```{r Estableciendo directorio y llamando DBS}
@@ -212,10 +211,38 @@ Por EDUCATIONo, se tiene más registros de personas solteras
 ```{r}
 # ¿Cuántos Casados y solteros hay por nivel educativo y que proporción representan en cada uno?
 table(EDUCATION, MARRIAGE)
-prop.table(table(EDUCATION, MARRIAGE)) # A NIVEL GLOBAL
+propGlob = prop.table(table(EDUCATION, MARRIAGE));propGlob # A NIVEL GLOBAL
 prop.table(table(EDUCATION, MARRIAGE), margin = 1) # A NIVEL VARIABLE EDUCATION
 prop.table(table(EDUCATION, MARRIAGE), margin = 2) # A NIVEL VARIABLE MARRIAGE
 ```
+```{r}
+library(flextable)
+
+propGlob = apply( 
+  prop.table(table(EDUCATION, MARRIAGE))*100, 
+  2, 
+  function(u) sprintf( "%.1f%%", u ) 
+)
+propGlob_f = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("graduate school", "university", "high school", "others")) %>% select(variables, married, single, divorced) %>% flextable(col_keys =  c("variables","married", "single", "divorced")) %>% theme_vader();propGlob_f
+
+
+
+
+propEdu = prop.table(table(EDUCATION, MARRIAGE), margin = 1) %>% as.data.frame.matrix()
+
+propMarri = prop.table(table(EDUCATION, MARRIAGE), margin = 2) %>% as.data.frame.matrix()
+
+
+
+
+# myft = bold(myft, ~ MARRIAGE == 'married', ~ MARRIAGE, bold = TRUE)
+# myft
+```
+```{r}
+prop.table(table(EDUCATION, MARRIAGE))
+```
+
+
 ```{r}
 gg1 = ggplot(df0) +
   geom_bar(mapping = aes(x=SEX, fill = EDUCATION))
@@ -226,6 +253,9 @@ gg2 = ggplot(df0) +
 gg1 / gg2
 
 ```
+
+
+
 ```{r}
 
 gg3 = ggplot(df0) +
@@ -237,6 +267,17 @@ gg4 = ggplot(df0) +
 gg3 / gg4
 
 ```
+
+```{r}
+gg2 = gg2+ theme(plot.title=element_text(size=10))+
+ ggtitle("Agrupación de nivel educativo por sexo") 
+
+gg2 / gg3+ theme(plot.title=element_text(size=10))+
+ ggtitle("Agrupación de estado civil por sexo")
+```
+
+
+
 #Conociendo la edad promedio y la grupación por edad de la población por sexo
 ```{r}
 #Densidad
@@ -255,11 +296,6 @@ ggplot(df0, aes(x=AGE, fill=SEX)) +
 
 
 ```{r}
-#Densidad
-# ggplot(df0, aes(x=AGE))+
-#   geom_area(aes(y = ..density.., fill=EDUCATION), stat = "bin")
-
-#Conteo
 mu <- ddply(df0, "EDUCATION", summarise, grp.mean=mean(AGE))
 head(mu)
 
@@ -301,8 +337,10 @@ ggplot(df0[df0$SEX == 2], aes(x=AGE, fill=EDUCATION)) +
 ```
 
 ```{r}
-ggplot(df0) +
-  geom_boxplot(mapping = aes(x=EDUCATION, y = AGE, fill=SEX))
+ggagebp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = AGE, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución de la edad por nivel educativo y sexo")
+ggagebp
 ```
 
 
@@ -335,12 +373,14 @@ ggplot(df0_1, aes(x=LIMIT_BAL, fill=SEX))+
 
 Distribución y concentración en variable categorica del crédito por nivel educativo
 ```{r}
-ggplot(df0) +
-  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=SEX))
+gglimbp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución del crédito máximo por nivel educativo y sexo")
+
+gglimbp
 ```
 
 
-¿Por qué parece que se tienen más registros de hombres que de mujeres en las ultimas trazas?
 ```{r}
 ggplot(df0) +
   geom_tile(mapping = aes( x= EDUCATION, y = MARRIAGE, fill = LIMIT_BAL))
@@ -617,6 +657,8 @@ EL perfil del consumidor estará definido por la moda del estatus de pago (repay
 
 
 ```{r}
+
+
 #Creando una función que saque la moda de las variables que catalogan el estado del pago del mes (repayment status)
 mode_function = function(x){
 x = as.numeric(as.character(x)) # Cambia a numérico sin cambiar los valores
@@ -625,8 +667,13 @@ return(r)
 }
 
 net_differences_bymonths_pay = net_differences_bymonths %>% select(PAY_1, PAY_2, PAY_3, PAY_4, PAY_5, PAY_6)
+
+net_differences_bymonths$CLIENT_TYPE = apply(net_differences_bymonths_pay[,-1], 1, mode_function)
+net_differences_bymonths$CLIENT_TYPE = as.factor(net_differences_bymonths$CLIENT_TYPE)
 net_differences_bymonths$CLIENT_PROFILE = apply(net_differences_bymonths_pay[,-1], 1, mode_function)
-net_differences_bymonths$CLIENT_PROFILE = as.factor(net_differences_bymonths$CLIENT_PROFILE)
+net_differences_bymonths$CLIENT_PROFILE = factor(net_differences_bymonths$CLIENT_PROFILE, levels = c(-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8), labels =  c('Perfil_1','Perfil_2', 'Perfil_3', 'Perfil_4', 'Perfil_4', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5'))
+
+
 
 
 ```
@@ -636,6 +683,17 @@ net_differences_bymonths$CLIENT_PROFILE = as.factor(net_differences_bymonths$CLI
 
 ```{r}
 
+mu <- ddply(net_differences_bymonths, "CLIENT_TYPE", summarise, grp.mean=mean(LIMIT_BAL))
+head(mu)
+
+ggplot(net_differences_bymonths, aes(x=LIMIT_BAL, fill=SEX)) +
+  geom_area(stat ="bin", alpha=0.6)+
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean),
+             linetype="dashed")+ theme(legend.position="bottom")+
+  facet_grid(CLIENT_TYPE ~ .)
+```
+
+```{r}
 mu <- ddply(net_differences_bymonths, "CLIENT_PROFILE", summarise, grp.mean=mean(LIMIT_BAL))
 head(mu)
 
@@ -646,62 +704,202 @@ ggplot(net_differences_bymonths, aes(x=LIMIT_BAL, fill=SEX)) +
   facet_grid(CLIENT_PROFILE ~ .)
 ```
 
+
+
 ```{r}
-ggplot(net_differences_bymonths) +
+gglimbp2 =  ggplot(net_differences_bymonths) +
   geom_boxplot(mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=15))+
   ggtitle("Distribución del limite crediticio por perfil del cliente y por sexo")
+
+gglimbp2
 ```
 
 ```{r}
-ggplot(net_differences_bymonths) +
+gglimbp3 = ggplot(net_differences_bymonths) +
   geom_boxplot(mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=EDUCATION))+ theme(plot.title=element_text(size=14))+
   ggtitle("Distribución del limite crediticio por perfil del cliente y por educación")
+gglimbp3
 ```
 
 
 ```{r}
-ggplot(net_differences_bymonths) +
+ggperf1 = ggplot(net_differences_bymonths) +
   geom_bar(mapping = aes(x=CLIENT_PROFILE, fill=SEX))+ theme(plot.title=element_text(size=15))+
   ggtitle("Perfil del cliente por sexo")
-```
 
-```{r}
-
-unique(net_differences_bymonths$EDUCATION)
-ggplot(net_differences_bymonths, aes( x= CLIENT_PROFILE, y = EDUCATION, fill = LIMIT_BAL)) +
-  geom_tile(color = "white",
-            lwd = 0.1,
-            linetype = 1)+
-  guides(fill = guide_colourbar(barwidth = 0.5,
-                                barheight = 12))+ theme(plot.title=element_text(size=10))+
-  ggtitle("Limite crediticio por perfil y nivel educativo")
+ggperf1
 ```
 
 
 Sacando quantiles del limit bal por tipo de perfil del cliente dado por la moda del estatus de pago a lo largo de los 6 meses
 
+```{r}
+
+```
+
 Sacando un box plot con el mismo ejercicio
 ```{r}
-
 ```
 
 
 
 
-Sacando correlaciones entre:
+Generando modelos de regresión para la variable AGE como independiente y la variable LIMIT_BAL como dependiente
 
-- El perfil del cliente dado por la moda del estatus de pago a lo largo de los 6 meses y el limit bal.
-- Educación y el limit bal
-- Sexo y el limit bal
-- Estado civil y el limit bal
+- Checando normalidad en los datos
+- Checando homoscedasticidad en los datos
+- Probando estandarizando
+- Aplicando pruebas no parametricas
 
--Limit bal y nivel educativo (generar grafica también)
--Gasto promedio mensual y nivel educativo (generar grafica también)
-- GPM y sexo (generar grafica también)
-- GPM y perfil del cliente (generar grafica también)
+
+Con un histograma
+```{r}
+df_pruebas = select(net_differences_bymonths, AGE, LIMIT_BAL)
+hist(df_pruebas$LIMIT_BAL)
+hist(df_pruebas$AGE)
+
+```
+
+Pruebas de shapiro test y kolmogorov smirnov para la normalidad de los datos
+```{r}
+library(nortest)
+lillie.test(df_pruebas$LIMIT_BAL)
+shapiro.test(df_lm$LIMIT_BAL[0:500])
+
+lillie.test(df_pruebas$AGE)
+shapiro.test(df_lm$AGE[0:500])
+
+#Se rechaza la H0, los datos no son normales
+```
+Normalizando datos
 
 ```{r}
+#+++ Reescalando datos ++++
 
+df_pruebas_rescalado = as.data.frame(scale(df_pruebas, center = T, scale = T))
+
+hist(df_pruebas_rescalado$LIMIT_BAL)
+lillie.test(df_pruebas_rescalado$LIMIT_BAL)
+shapiro.test(df_pruebas_rescalado$LIMIT_BAL[0:500])
+
+hist(df_pruebas_rescalado$AGE)
+lillie.test(df_pruebas_rescalado$AGE)
+shapiro.test(df_pruebas_rescalado$AGE[0:500])
+
+```
+
+Ya que los datos siguen siendo no normales, se aplica un escalar robusto
+
+
+```{r}
+robust_scalar = function(x){(x - median(x) / (quantile(x, probs =.75)-quantile(x, probs=0.25)))}
+
+df_pruebas_robust_scalar = as.data.frame(lapply(df_pruebas, robust_scalar))
+
+
+hist(df_pruebas_robust_scalar$LIMIT_BAL)
+lillie.test(df_pruebas_robust_scalar$LIMIT_BAL)
+shapiro.test(df_pruebas_robust_scalar$LIMIT_BAL[0:500])
+
+hist(df_pruebas_robust_scalar$AGE)
+lillie.test(df_pruebas_robust_scalar$AGE)
+shapiro.test(df_pruebas_robust_scalar$AGE[0:500])
+
+```
+
+
+```{r}
+df_lm = select(net_differences_bymonths, CLIENT_TYPE, LIMIT_BAL, AGE);df_lm
+
+plot(LIMIT_BAL~AGE, data = df_lm)
+#parametrica
+cor.test(~LIMIT_BAL+AGE, data = df_lm, method="pearson", conf.level=0.95)
+#no parametrica
+```
+Shapiro test para evaluar la normalidad de los datos
+
+```{r}
+shapiro.test(df_lm$LIMIT_BAL[0:400])
+shapiro.test(df_lm$AGE[0:400])
+
+#Se concluye en un posible error tipo 1
+```
+Prueba breusch-pagan
+```{r}
+
+df_lm2 = select(net_differences_bymonths, CLIENT_TYPE, CLIENT_PROFILE,  LIMIT_BAL, AGE);df_lm2
+attach(df_lm2)
+library(lmtest)
+model1 = lm(AGE~LIMIT_BAL)
+bptest(model1)
+
+residuals(model1)
+plot(residuals(model1), type="l")
+```
+
+
+ANOVA Y POST-HOC
+
+```{r}
+#preparando los datos
+
+df_anova = select(net_differences_bymonths, CLIENT_PROFILE, LIMIT_BAL);df_anova
+attach(df_anova)
+anova1 = aov(LIMIT_BAL~CLIENT_PROFILE)
+summary(anova1)
+#Se acepta la hipotesis alternativa, pvalue es < 0.05
+```
+La prueba de tukey nos dira estadísticamente cuales medias difieren de cuales, complementando al anova
+```{r}
+TukeyHSD(anova1)
+```
+```{r}
+anova2 = lm(LIMIT_BAL~CLIENT_PROFILE)
+summary(anova2)
+anova(anova2)
+```
+```{r}
+par(mfrow=c(2,2))
+plot(anova2)
+```
+
+Corroborando homogeneidad de varianzas, esta resulta estadisticamente significativa y no hay homogeneidad 
+```{r}
+
+fligner.test(LIMIT_BAL, CLIENT_PROFILE, data=df_anova)
+
+```
+No se cumplen los supuestos para realizar un modelo ANOVA
+
+
+
+```{r}
+tukey1 = TukeyHSD(aov(anova2))
+plot(tukey1, col="red", las=1, cex.axis=0.5, cex.lab=0.5, cex=0.5)
+```
+
+SE EMPLEA UNA PRUEBA NO PARAMETRICA QUE NO REQUIERE EL CUMPLIMIENTO DEL SUPUESTO DE HOMOGENEIDAD DE VARIANZAS, HOMOCEDASTICIDAD Y NORMALIDAD DE LOS RESIDUOS.- KRUSTAL-WALLS
+
+#### test Kruskal-Wallis
+
+Variable independiente: CLIENT_PROFILE
+
+```{r}
+df_pruebas = select(net_differences_bymonths, CLIENT_PROFILE, AGE, LIMIT_BAL)
+net_differences_bymonths
+kruskal.test(LIMIT_BAL, CLIENT_PROFILE, data = net_differences_bymonths)
+```
+La hipótesis nula (H 0 ): El limite de crédito medio es el mismo para todos lso tipos de clientes
+
+La hipótesis alternativa: (Ha): Al menos una media del limite de crédito por perfil de cliente es diferente.
+
+Se rechaza la hipotesis nula y se corrobora que la variable de respuesta (monto maximo de crédito) cambia como efecto en el cambio de edad
+
+
+Prueba post-hoc
+
+```{r}
+pairwise.wilcox.test(df_pruebas$LIMIT_BAL, df_pruebas$CLIENT_PROFILE)
 ```
 
 
@@ -709,13 +907,21 @@ Sacando correlaciones entre:
 
 
 
+Variable independiente: AGE
 
+```{r}
+kruskal.test(LIMIT_BAL, AGE, data = net_differences_bymonths)
+```
+Prueba post-hoc
 
+```{r}
+pairwise.wilcox.test(df_pruebas$LIMIT_BAL, df_pruebas$AGE)
+```
 
-
-
-
-
+```{r}
+library(ggplot2)
+plot(data = df_pruebas, x = CLIENT_PROFILE,  y=LIMIT_BAL)
+```
 
 
 
@@ -724,3 +930,6 @@ APARTADO DE CONCLUSIONES:
 
 
 - Parece ser que aunque los grupos delimitados por educacion, sexo y estado civil, tienen diferentes topes de credito, unos con mayor limite, a excepción de los outliers todos se endeudan en la misma cantidad y pagan la misma cantidad
+
+-La prueba H y los boxplots de perfil cliente como independiente y limit bal como d
+existe menos de un 5% de prob que una dif tan grande en el limit val de cada perfil se deba al azar

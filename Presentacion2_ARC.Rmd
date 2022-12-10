@@ -1,0 +1,506 @@
+---
+title: "Análisis estadístico"
+subtitle: ""
+author: "Alexis Rangel"
+date: "2022-12-07"
+output:
+  xaringan::moon_reader:
+    css: 
+      css/stylesheet.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      navigation: 
+        scroll: false
+---
+name: about-me
+layout: false
+class: about-me-slide, middle, center
+background-color: var(--DarkRed)
+
+# About me
+
+<img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/u/92005917?v=4.png" width="250px"/>
+s
+## Alexis Rangel Calvo
+#### Lic en economía y programador jr
+
+.fade[Propedeutico MAEA FACE UJED]
+
+[`r fontawesome::fa("twitter", a11y = "sem")` @alexrangelcalvo](https://mobile.twitter.com/alexrangelcalvo)
+[`r fontawesome::fa("github", a11y = "sem")` @alexisrangelcalvo](https://github.com/alexisrangelcalvo)
+
+---
+### Planteamiento del problema
+
+<div style="text-align: justify">Las entidades  financieras  y bancarias, como parte de su operación díaria, se encuentran lidiando y mitigando los riesgos financieros inherentes a cada operación crediticia que implica incertidumbre y que, por tanto, puede ocasionar alguna consecuencia financiera negativa para la organización.  <div/>
+<Br>
+
+<div style="text-align: justify">Dentro de estas organizaciones, los datos históricos del comportamiento crediticio de sus clientes y todo el procesamiento como modelado que se pueda hacer con estos, representan una fuente de información valiosa para la toma de decisiones directiva del día a día.<div/>
+<Br>
+
+<div style="text-align: justify"> <span id = "myspan"> Para dar un primer acercamiento a estos complejos procesos, y como problema a resolver, se planteo un análisis estadístico **descriptivo** de 30 mil registros relativos al comportamiento de usuarios de tarjetas de crédito en Taiwan para los meses de abril del 2005 a septiembre del mismo año.<span/> <div/>
+<Hr>
+---
+
+###Objetivo general
+
+<div style="text-align: justify">Describir el comportamiento de los usuarios de tarjetas de crédito, luego de una clasificación por tipo de perfil de cliente basado en el consumo-pago de la linea de crédito mes con mes, y establecer correlaciones simples entre las variables disponibles, especialmente situando a la variable de limite de crédito como foco de atención, para plantear hipótesis de la muestra estudiada.<div/>
+
+
+<Hr>
+
+###Objetivos particulares
+
+* Tratamiento, limpieza de datos y exclusión de registros de clientes con datos incompletos que no permitan su estudio.
+
+* Establecer perfiles de consumo con base en su comportamiento **consumo-pago** de la linea de crédito.
+* GGenerar gráficos descriptivos del comportamiento financiero de los usuarios.
+
+* Establecer correlaciones y plantear hipótesis de la muestra estudiada.
+<Hr>
+
+---
+###Limitaciones
+
+Ninguna, los limites estan en la mente.
+
+---
+
+###Marco teórico
+
+<div style="text-align: justify">**Riesgo financiero:** Cualquier actividad empresarial que implica incertidumbre y que, por tanto, pueda ocasionar alguna consecuencia financiera negativa para la organización.<div/> 
+<Br>
+
+|Tipo de riesgo | Definición|
+:------------: | :----------------
+|Crédito   | <div style="text-align: justify">Considerado por las entidades bancarias como la probabilidad de impago del prestatario o el incumplimiento de las condiciones pactadas del contrato.<div/> |
+|Tipo de interés       | <div style="text-align: justify">Implicito a la naturaleza del negocio bancario, movimientos ascendentes o descendentes de la tasa de interés activa o pasiva incidiran en el crédito<div/>|
+|Liquidez | Se refiere a que el banco no pueda satisfacer la demanda de dinero ante una eventualidad como la retirada masiva de los depositos.|
+|Mercado | Se origina como consecuencia de los movimientos que afectan el valor de la cartera de inversión y negociación de la entidad.|
+|Operativo | <div style="text-align: justify">Surge como consecuencia del mal funcionamiento de los sitemas de control y gestion de la entidad 8sistemas informáticos, errores humanos, entre otros.)<div/> |
+|Reputación | <div style="text-align: justify">El deterioro de la imagen del banco ante los clientes por publicidad negativa<div/> |
+Tabla 1: Tipos de riesgos financieros en el negocio bancario.
+
+Fuente: Ruza & Curbera (2013)
+
+---
+###Marco teórico
+
+<div style="text-align: justify">**Definiendo perfiles de clientes:** La variable PAY_X (1:6) define el estatus del pago de septiembre a abril en orden inverso. Cada mes se generá este estatus de pago al evaluar la variable BILL_AMTX (1:6), que es la cantidad a pagar en el mes, contra la variable PAY_AMT1, que es la cantidad pagada por el usuario en el mes.<div/>
+
+
+
+En la documentación de la propia base se establecen el significado para cada estatus de pago:
++ -2 indica no consumo en el periodo (que no se utilizó la TC)
++ -1 indica que el saldo de la TC fue pagado en su totalidad.
++ 0  indica que se uso un crédito revolvente (se pagó el mínimo para no generar intereses, pero no se liquido el crédito)
++ 1 indica que el  pago esta retrasado por un mes (30 días)
++ 2 indica que el pago esta retrasado por dos meses (60 días)
++ 3 indica que el pago esta retrasado por dos meses (90 días)
++ …
++ 9 indica que el pago esta retrasado por nueve meses o más (>= 270 días)
+
+---
+
+###Marco teórico
+
+<div style="text-align: justify">Debido a que un promedio de los 6 meses no parece viable, para sacar un perfil de consumidor en los 6 meses para cada usuario, se opto por usar la moda con la siguiente función elaborada (dada la inexistencia de esta en el software R) como medida de tendencia central que segmentara entre grupos:<div/>
+
+```{r}
+#Quizás no sea necesaria esta diapo
+mode_function = function(x){
+x = as.numeric(as.character(x)) # Cambia a numérico sin cambiar los valores
+r = as.numeric(names(which.max(table(x)))[1]) # Primer numero con mayor frecuencia
+return(r)
+}
+
+#xaringan::inf_mr()
+```
+
+xaringan::inf_mr()
+---
+###Metodología:
+<div style="text-align: justify">El análisis se acota en el campo cuantitativo, de tipo descriptivo, con un diseño no experimental longitudinal de tendencia. La población estuvo conformada por 30 mil registros de usuarios de tarjetas de crédito en Taiwan para el periodo de abril a septiembre (6 meses) del 2005.<div/>
+<Hr>
+
+---
+
+
+
+```{r Estableciendo directorio y llamando DBS, include=FALSE}
+setwd("~/Maestria/Curso propedeutico/coloquio/ColoquioMAEA") 
+#estableciendo directorio
+library(readr)
+library(ggplot2)
+library(tidyr)
+library(readxl)
+library(dplyr)
+library(magrittr)
+library(glue)
+library(plyr)
+library(patchwork) #for subplots
+library(plotly)#file.choose()
+library(flextable)
+ruta_db = "./DBS/Default of Credit Card Clients Dataset/UCI_Credit_Card.csv"
+
+df0 = read.csv(ruta_db)
+dfbase = read.csv(ruta_db)
+```
+
+
+
+```{r excluyendo NIVEL variables registros no identificados en la BD, include=FALSE}
+names(df0)
+head(df0)
+
+unique(df0$SEX)
+df0$SEX = factor(df0$SEX, levels = c(1, 2), labels =  c('Hombre','Mujer'))
+
+
+#filtrando el df0 solo con valores reconocidos para la var MARRIAGE
+
+df0$EDUCATION[df0$EDUCATION == 6] = 5
+df0$EDUCATION[df0$EDUCATION == 5] = 4
+df0$EDUCATION[df0$EDUCATION == 0] = 4
+unique(df0$EDUCATION)
+recognized_levels_EDUCATION = c(1, 2, 3, 4)
+df0 = df0[df0$MARRIAGE %in% recognized_levels_EDUCATION, ]
+df0$EDUCATION = factor(df0$EDUCATION, levels = c(1,2,3,4), labels =  c('graduate school', 'university', 'high school', 'others'))
+unique(df0$EDUCATION)
+
+
+
+# MARRIAGE: Marital status (1=married, 2=single, 3=others)
+unique(df0$MARRIAGE)
+recognized_levels_marriage = c(1, 2, 3)
+df0 = df0[df0$MARRIAGE %in% recognized_levels_marriage, ]
+df0$MARRIAGE = factor(df0$MARRIAGE, levels = recognized_levels_marriage, labels =  c('married', 'single', 'divorced'))
+
+
+#FILTRANDO VALORES NO RECONOCIDOS EN COLUMNA PAY
+
+#df0 %>% rename ('PAY_1' = 'PAY_0')
+
+df0 = rename(df0, PAY_1 = PAY_0)
+unique(df0$PAY_1)
+#Se plantea sustituir el -2 por el 0 ya que indican lo mismo, sin pago en el balance del mes
+#df0$PAY_1[df0$PAY_1 == -2] = 0
+df0$PAY_1 = as.factor(df0$PAY_1)
+#df0$PAY_2[df0$PAY_2 == -2] = 0
+df0$PAY_2 = as.factor(df0$PAY_2)
+#df0$PAY_3[df0$PAY_3 == -2] = 0
+df0$PAY_3 = as.factor(df0$PAY_3)
+#df0$PAY_4[df0$PAY_4 == -2] = 0
+df0$PAY_4 = as.factor(df0$PAY_4)
+#df0$PAY_5[df0$PAY_5 == -2] = 0
+df0$PAY_5 = as.factor(df0$PAY_5)
+#df0$PAY_6[df0$PAY_6 == -2] = 0
+df0$PAY_6 = as.factor(df0$PAY_6)
+"
+-2: No consumption; -1: Paid in full; 0: The use of revolving credit; 1 = payment delay for one month; 2 = payment delay for two months; . . .; 8 = payment delay for eight months; 9 = payment delay for nine months and above.
+"
+
+"
+Intentando implementar un bucle
+"
+# for (name in names(df0)) {
+#   if (name %in% c('PAY_0', 'PAY_2', 'PAY_3', 'PAY_4', 'PAY_5'))
+#   {
+#     recognized_levels_pay = c(-1, 1, 2, 3, 4, 5, 6, 7, 8)
+#   df0 = df0[df0[glue('{name}')] %in% recognized_levels_pay, ]
+#   df0[glue('{name}')] = as.factor(df0[glue('{name}')])
+#   }
+# }
+
+
+diferencia_df0_dfbase = dim(dfbase)[1] - dim(df0)[1]
+
+glue('INFORME: Al finalizar los primeros filtrados de valores no especificados de la BD, se eliminaron {diferencia_df0_dfbase} registros de un total de {length(dfbase)}')
+```
+
+####Conociendo a la población de estudio-subtitle
+```{r, include=FALSE}
+
+gg2 = ggplot(df0) +
+  geom_bar(mapping = aes(y=EDUCATION, fill = SEX))
+
+gg2 = gg2+ theme(plot.title=element_text(size=10))+
+ ggtitle("Agrupación de nivel educativo por sexo") 
+
+```
+
+```{r, include=FALSE}
+mu <- ddply(df0, "EDUCATION", summarise, grp.mean=mean(AGE))
+head(mu)
+
+ggarea1 = ggplot(df0, aes(x=AGE, fill=EDUCATION)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=EDUCATION),
+             linetype="dashed")+ theme(legend.position="bottom")
+```
+
+
+---
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+.panelset[
+.panel[.panel-name[Plot]
+
+```{r panel-chunk, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE, message=FALSE}
+
+gg2 / ggarea1
+
+```
+]
+
+.panel[.panel-name[Interpretación]
+
+**Aquí ira una breve interpretación de la anterior gráfica**
+
+]
+
+.panel[.panel-name[R Code]
+
+```{r}
+gg2 = ggplot(df0) +
+  geom_bar(mapping = aes(y=EDUCATION, fill = SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Agrupación de nivel educativo por sexo") 
+```
+
+```{r}
+mu <- ddply(df0, "EDUCATION", summarise, grp.mean=mean(AGE))
+ggarea1 = ggplot(df0, aes(x=AGE, fill=EDUCATION)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=EDUCATION),
+             linetype="dashed")+ theme(legend.position="bottom")
+```
+
+
+]
+]
+<!-- cerrando diapositiva panel set 1 -->
+
+<!-- abriendo diapositiva panel set 2-->
+---
+.panelset[
+.panel[.panel-name[Plot]
+
+```{r, include=FALSE}
+mu <- ddply(df0, "MARRIAGE", summarise, grp.mean=mean(AGE))
+
+ggarea1 = ggplot(df0, aes(x=AGE, fill=MARRIAGE)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=MARRIAGE),
+             linetype="dashed")+ theme(legend.position="bottom")
+
+gg3 = ggplot(df0) +
+  geom_bar(mapping = aes(y=MARRIAGE, fill = SEX))
+gg3 = gg3 + theme(plot.title=element_text(size=10))+
+ ggtitle("Agrupación de estado civil por sexo")
+```
+
+```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE, message=FALSE}
+gg3 / ggarea1
+```
+]
+
+.panel[.panel-name[Interpretación]
+
+**Aquí ira una breve interpretación de la anterior tabla**
+
+]
+
+.panel[.panel-name[R Code]
+
+
+
+```{r}
+gg3 = ggplot(df0) +
+  geom_bar(mapping = aes(y=MARRIAGE, fill = SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Agrupación de estado civil por sexo")
+```
+
+```{r}
+mu <- ddply(df0, "EDUCATION", summarise, grp.mean=mean(AGE))
+
+ggarea1 = ggplot(df0, aes(x=AGE, fill=EDUCATION)) +
+  geom_area(stat ="bin", alpha=0.6) +
+  theme_classic()+geom_vline(data=mu, aes(xintercept=grp.mean, color=EDUCATION),
+             linetype="dashed")+ theme(legend.position="bottom")
+```
+
+]
+]
+
+---
+<!-- cerrando diapositiva panel set 2 -->
+
+<!-- abriendo diapositiva panel set 3-->
+.panelset[
+.panel[.panel-name[Flextable]
+
+```{r, include=FALSE}
+propGlob = apply(
+  prop.table(table(df0$EDUCATION, df0$MARRIAGE))*100,
+  2,
+  function(u) sprintf( "%.1f%%", u )
+)
+propGlob_f = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("graduate school", "university", "high school", "others")) %>% select(variables, married, single, divorced) %>% flextable(col_keys =  c("variables","married", "single", "divorced")) %>% theme_vader()
+```
+
+```{r, echo=FALSE}
+propGlob_f
+```
+]
+
+.panel[.panel-name[Interpretación]
+
+**Aquí ira una breve interpretación de la anterior tabla**
+
+]
+
+.panel[.panel-name[R Code]
+
+```{r}
+propGlob = apply(
+  prop.table(table(df0$EDUCATION, df0$MARRIAGE))*100,
+  2,
+  function(u) sprintf( "%.1f%%", u )
+)
+
+```
+
+```{r}
+propGlob_f = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("graduate school", "university", "high school", "others")) %>% select(variables, married, single, divorced) %>% flextable(col_keys =  c("variables","married", "single", "divorced")) %>% theme_vader()
+```
+]
+]
+
+<!-- cerrando diapositiva panel set 3 -->
+
+
+<!-- diapo-slide perfiles -->
+---
+
+---
+
+<!-- inicianod analsiis de perfiles -->
+
+---
+.panelset[
+.panel[.panel-name[PLot]
+
+```{r, include=FALSE}
+ggagebp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = AGE, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución de la edad por nivel educativo y sexo")
+gglimbp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución del crédito máximo por nivel educativo y sexo")
+```
+
+```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+ggagebp / gglimbp
+```
+]
+
+.panel[.panel-name[Interpretación]
+
+**Aquí ira una breve interpretación de la anterior tabla**
+
+]
+
+.panel[.panel-name[R Code]
+
+```{r}
+ggagebp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = AGE, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución de la edad por nivel educativo y sexo")
+
+
+```
+
+```{r}
+gglimbp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución del crédito máximo por nivel educativo y sexo")
+```
+]
+]
+
+---
+
+```{r, include=FALSE}
+
+unique(df0$EDUCATION)
+net_differences_bymonths = df0 %>% 
+  mutate(ND_1 = BILL_AMT1-PAY_AMT1, ND_2 = BILL_AMT2 - PAY_AMT2, ND_3 = BILL_AMT3 - PAY_AMT3, ND_4 = BILL_AMT4 - PAY_AMT4, ND_5 = BILL_AMT5 - PAY_AMT5, ND_6 = BILL_AMT6 - PAY_AMT6) %>% select(ID, SEX, MARRIAGE, AGE, EDUCATION, LIMIT_BAL, PAY_1, PAY_AMT1, BILL_AMT1, ND_1, PAY_2, PAY_AMT2, BILL_AMT2, ND_2, PAY_3, PAY_AMT3, BILL_AMT3, ND_3, PAY_4, PAY_AMT4, BILL_AMT4, ND_4, PAY_5, PAY_AMT5, BILL_AMT5, ND_5, PAY_6, PAY_AMT6, BILL_AMT6, ND_6, default.payment.next.month)
+
+net_differences_bymonths
+"
+-2: No consumption; -1: Paid in full; 0: The use of revolving credit; 1 = payment delay for one month; 2 = payment delay for two months; . . .; 8 = payment delay for eight months; 9 = payment delay for nine months and above.
+"
+
+"
+Una opinión en una discusión ofrece este otro vistazo de algunos de los valores que pueden tomar la variable PAY_X
+-2 = Balance paid in full and no transactions this period (we may refer to this credit card account as having been 'inactive' this period)
+
+-1 = Balance paid in full, but account has a positive balance at end of period due to recent transactions for which payment has not yet come due
+
+0 = Customer paid the minimum due amount, but not the entire balance. I.e., the customer paid enough for their account to remain in good standing, but did revolve a balance
+"
+```
+
+```{r, include=FALSE}
+
+
+#Creando una función que saque la moda de las variables que catalogan el estado del pago del mes (repayment status)
+mode_function = function(x){
+x = as.numeric(as.character(x)) # Cambia a numérico sin cambiar los valores
+r = as.numeric(names(which.max(table(x)))[1]) # Primer numero con mayor frecuencia
+return(r)
+}
+
+net_differences_bymonths_pay = net_differences_bymonths %>% select(PAY_1, PAY_2, PAY_3, PAY_4, PAY_5, PAY_6)
+
+net_differences_bymonths$CLIENT_TYPE = apply(net_differences_bymonths_pay[,-1], 1, mode_function)
+net_differences_bymonths$CLIENT_TYPE = as.factor(net_differences_bymonths$CLIENT_TYPE)
+net_differences_bymonths$CLIENT_PROFILE = apply(net_differences_bymonths_pay[,-1], 1, mode_function)
+net_differences_bymonths$CLIENT_PROFILE = factor(net_differences_bymonths$CLIENT_PROFILE, levels = c(-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8), labels =  c('Perfil_1','Perfil_2', 'Perfil_3', 'Perfil_4', 'Perfil_4', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5'))
+
+```
+
+
+
+## Análisis de perfiles
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+
+ggperf1 = ggplot(net_differences_bymonths) +
+  geom_bar(mapping = aes(x=CLIENT_PROFILE, fill=SEX))+ theme(plot.title=element_text(size=15))+
+  ggtitle("Perfil del cliente por sexo")
+
+ggperf1
+
+```
+
+
+---
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+gglimbp2 =  ggplot(net_differences_bymonths) +
+  geom_boxplot(mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=15))+
+  ggtitle("Distribución del limite crediticio por perfil del cliente y por sexo")
+
+gglimbp2
+```
+
+---
+
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+gglimbp3 = ggplot(net_differences_bymonths) +
+  geom_boxplot(mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=EDUCATION))+ theme(plot.title=element_text(size=14))+
+  ggtitle("Distribución del limite crediticio por perfil del cliente y por educación")
+gglimbp3
+```
