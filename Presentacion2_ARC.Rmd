@@ -32,58 +32,58 @@ s
 [`r fontawesome::fa("github", a11y = "sem")` @alexisrangelcalvo](https://github.com/alexisrangelcalvo)
 
 ---
+
+### Sobre la base de datos
+
+---
+
 ### Planteamiento del problema
 
-<div style="text-align: justify">Las entidades  financieras  y bancarias, como parte de su operación díaria, se encuentran lidiando y mitigando los riesgos financieros inherentes a cada operación crediticia que implica incertidumbre y que, por tanto, puede ocasionar alguna consecuencia financiera negativa para la organización.  <div/>
+<!-- <div style="text-align: justify">Las entidades  financieras  y bancarias, como parte de su operación díaria, se encuentran lidiando y mitigando los riesgos financieros inherentes a cada operación crediticia que implica incertidumbre y que, por tanto, puede ocasionar alguna consecuencia financiera negativa para la organización.  <div/> -->
+<!-- <Br> -->
+
+<!-- <div style="text-align: justify">Dentro de estas organizaciones, los datos históricos del comportamiento crediticio de sus clientes y todo el procesamiento como modelado que se pueda hacer con estos, representan una fuente de información valiosa para la toma de decisiones directiva del día a día.<div/> -->
+<!-- <Br> -->
+
+<!-- <div style="text-align: justify"> <span id = "myspan"> Para dar un primer acercamiento a estos complejos procesos, y como problema a resolver, se planteo un análisis estadístico **descriptivo** de 30 mil registros relativos al comportamiento de usuarios de tarjetas de crédito en Taiwan para los meses de abril del 2005 a septiembre del mismo año.<span/> <div/> -->
+
+
+<div style="text-align: justify">En la mencionada base de datos contamos con variables demograficas de tipo discretas y del comportamiento del uso de tarjetas de crédito, de tipo continua, para cada cliente.<div/>
+
 <Br>
 
-<div style="text-align: justify">Dentro de estas organizaciones, los datos históricos del comportamiento crediticio de sus clientes y todo el procesamiento como modelado que se pueda hacer con estos, representan una fuente de información valiosa para la toma de decisiones directiva del día a día.<div/>
-<Br>
-
-<div style="text-align: justify"> <span id = "myspan"> Para dar un primer acercamiento a estos complejos procesos, y como problema a resolver, se planteo un análisis estadístico **descriptivo** de 30 mil registros relativos al comportamiento de usuarios de tarjetas de crédito en Taiwan para los meses de abril del 2005 a septiembre del mismo año.<span/> <div/>
+<div style="text-align: justify">*¿Hay alguna de estas variables que pueda explicar el por qué algunos clientes tienen mucho más limite crediticio que otros? ¿Se puede modelar una aproxiumación a dicha relación?*<div/>
 <Hr>
+
 ---
 
 ###Objetivo general
 
-<div style="text-align: justify">Describir el comportamiento de los usuarios de tarjetas de crédito, luego de una clasificación por tipo de perfil de cliente basado en el consumo-pago de la linea de crédito mes con mes, y establecer correlaciones simples entre las variables disponibles, especialmente situando a la variable de limite de crédito como foco de atención, para plantear hipótesis de la muestra estudiada.<div/>
 
-
+<div style="text-align: justify">Encontrar la relación de las variables que disponemos para cada cliente, especialmente de la variable edad y del comportamiento mes con mes en los seis periodos, con el limite crediticio. <div/>
 <Hr>
 
+
+---
 ###Objetivos particulares
 
-* Tratamiento, limpieza de datos y exclusión de registros de clientes con datos incompletos que no permitan su estudio.
+<div style="text-align: justify">* Tratamiento, limpieza de datos y exclusión de registros de clientes con datos incompletos que no permitan su estudio.<div/>
+<Br>
+<div style="text-align: justify">* Describir a los usuarios, a su comportamiento en el uso de tarjetas de crédito en los 6 meses disponibles y establecer perfiles de consumo (crear una nueva variable) con base en el comportamiento consumo-pago de la linea de crédito. Generar una sintesis, elaborar tablas y graficas que apoyen en esta tarea.<div/>
+<Br>
+<div style="text-align: justify">* Establecer correlaciones, elaborar un análisis de varianzas y testar hipótesis de la relación de las variables disponibles y generadas, y de la variable limite de crédito como variable de respuesta.<div/>
 
-* Establecer perfiles de consumo con base en su comportamiento **consumo-pago** de la linea de crédito.
-* GGenerar gráficos descriptivos del comportamiento financiero de los usuarios.
-
-* Establecer correlaciones y plantear hipótesis de la muestra estudiada.
 <Hr>
 
 ---
-###Limitaciones
-
-Ninguna, los limites estan en la mente.
+###Alcances
 
 ---
 
-###Marco teórico
+###Limitaciones
 
-<div style="text-align: justify">**Riesgo financiero:** Cualquier actividad empresarial que implica incertidumbre y que, por tanto, pueda ocasionar alguna consecuencia financiera negativa para la organización.<div/> 
-<Br>
-
-|Tipo de riesgo | Definición|
-:------------: | :----------------
-|Crédito   | <div style="text-align: justify">Considerado por las entidades bancarias como la probabilidad de impago del prestatario o el incumplimiento de las condiciones pactadas del contrato.<div/> |
-|Tipo de interés       | <div style="text-align: justify">Implicito a la naturaleza del negocio bancario, movimientos ascendentes o descendentes de la tasa de interés activa o pasiva incidiran en el crédito<div/>|
-|Liquidez | Se refiere a que el banco no pueda satisfacer la demanda de dinero ante una eventualidad como la retirada masiva de los depositos.|
-|Mercado | Se origina como consecuencia de los movimientos que afectan el valor de la cartera de inversión y negociación de la entidad.|
-|Operativo | <div style="text-align: justify">Surge como consecuencia del mal funcionamiento de los sitemas de control y gestion de la entidad 8sistemas informáticos, errores humanos, entre otros.)<div/> |
-|Reputación | <div style="text-align: justify">El deterioro de la imagen del banco ante los clientes por publicidad negativa<div/> |
-Tabla 1: Tipos de riesgos financieros en el negocio bancario.
-
-Fuente: Ruza & Curbera (2013)
+* Tiempo.
+* Limitación personal en el conocimiento de estadística.
 
 ---
 ###Marco teórico
@@ -104,29 +104,15 @@ En la documentación de la propia base se establecen el significado para cada es
 
 ---
 
-###Marco teórico
-
-<div style="text-align: justify">Debido a que un promedio de los 6 meses no parece viable, para sacar un perfil de consumidor en los 6 meses para cada usuario, se opto por usar la moda con la siguiente función elaborada (dada la inexistencia de esta en el software R) como medida de tendencia central que segmentara entre grupos:<div/>
-
-```{r}
-#Quizás no sea necesaria esta diapo
-mode_function = function(x){
-x = as.numeric(as.character(x)) # Cambia a numérico sin cambiar los valores
-r = as.numeric(names(which.max(table(x)))[1]) # Primer numero con mayor frecuencia
-return(r)
-}
-
-#xaringan::inf_mr()
-```
-
-xaringan::inf_mr()
----
 ###Metodología:
-<div style="text-align: justify">El análisis se acota en el campo cuantitativo, de tipo descriptivo, con un diseño no experimental longitudinal de tendencia. La población estuvo conformada por 30 mil registros de usuarios de tarjetas de crédito en Taiwan para el periodo de abril a septiembre (6 meses) del 2005.<div/>
+
+<div style="text-align: justify">Mediante el uso del software estadístico R y su interfaz R studio, y con los conocimientos aprendidos en los modulos del curso propedeutico, se generá un análisis se acota en el campo cuantitativo, de tipo descriptivo, con un diseño no experimental longitudinal de tendencia. La población estuvo conformada por 30 mil registros de usuarios de tarjetas de crédito en Taiwan para el periodo de abril a septiembre (6 meses) del 2005.
+
+Para la presentación visual de este proyecto se optó por usar slides en r markdown con moon reader, la paquetería Xaringan, programación con Python y CSS y el maquetado con HTML, con el fin de explorar otras formatos de presentaciones alternos.<div/>
+
 <Hr>
 
 ---
-
 
 
 ```{r Estableciendo directorio y llamando DBS, include=FALSE}
@@ -159,7 +145,7 @@ unique(df0$SEX)
 df0$SEX = factor(df0$SEX, levels = c(1, 2), labels =  c('Hombre','Mujer'))
 
 
-#filtrando el df0 solo con valores reconocidos para la var MARRIAGE
+#filtrando el df0 solo con valores reconocidos para la var EDUCATION
 
 df0$EDUCATION[df0$EDUCATION == 6] = 5
 df0$EDUCATION[df0$EDUCATION == 5] = 4
@@ -179,7 +165,7 @@ df0 = df0[df0$MARRIAGE %in% recognized_levels_marriage, ]
 df0$MARRIAGE = factor(df0$MARRIAGE, levels = recognized_levels_marriage, labels =  c('married', 'single', 'divorced'))
 
 
-#FILTRANDO VALORES NO RECONOCIDOS EN COLUMNA PAY
+#TRATAMIENTO A COLUMNA PAY
 
 #df0 %>% rename ('PAY_1' = 'PAY_0')
 
@@ -201,20 +187,6 @@ df0$PAY_6 = as.factor(df0$PAY_6)
 "
 -2: No consumption; -1: Paid in full; 0: The use of revolving credit; 1 = payment delay for one month; 2 = payment delay for two months; . . .; 8 = payment delay for eight months; 9 = payment delay for nine months and above.
 "
-
-"
-Intentando implementar un bucle
-"
-# for (name in names(df0)) {
-#   if (name %in% c('PAY_0', 'PAY_2', 'PAY_3', 'PAY_4', 'PAY_5'))
-#   {
-#     recognized_levels_pay = c(-1, 1, 2, 3, 4, 5, 6, 7, 8)
-#   df0 = df0[df0[glue('{name}')] %in% recognized_levels_pay, ]
-#   df0[glue('{name}')] = as.factor(df0[glue('{name}')])
-#   }
-# }
-
-
 diferencia_df0_dfbase = dim(dfbase)[1] - dim(df0)[1]
 
 glue('INFORME: Al finalizar los primeros filtrados de valores no especificados de la BD, se eliminaron {diferencia_df0_dfbase} registros de un total de {length(dfbase)}')
@@ -340,7 +312,7 @@ ggarea1 = ggplot(df0, aes(x=AGE, fill=EDUCATION)) +
 
 <!-- abriendo diapositiva panel set 3-->
 .panelset[
-.panel[.panel-name[Flextable]
+.panel[.panel-name[Tile plot]
 
 ```{r, include=FALSE}
 propGlob = apply(
@@ -349,11 +321,41 @@ propGlob = apply(
   function(u) sprintf( "%.1f%%", u )
 )
 propGlob_f = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("graduate school", "university", "high school", "others")) %>% select(variables, married, single, divorced) %>% flextable(col_keys =  c("variables","married", "single", "divorced")) %>% theme_vader()
+
+## Tile plot
+df0_tile = select(df0, EDUCATION, MARRIAGE, LIMIT_BAL)
+
+df0_tile2 = df0_tile %>% group_by(EDUCATION, MARRIAGE) %>%
+                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame() %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) 
+
+df0_tile2 = df0_tile2[order(df0_tile2$MARRIAGE), ]
+names(df0_tile2) = c("Educacion", "Estado_civil", "mean_cred_limit", "mean_cred_limit_h")
+rownames(df0_tile2)<-1:nrow(df0_tile2)
+
+ggtile1 = ggplot(df0_tile2, aes( x= Educacion, y = Estado_civil, fill = mean_cred_limit)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("Limite crediticio promedio por eduación y por estado civil (miles de dólares)")+
+  geom_text(aes(label = mean_cred_limit_h), color = "white", size = 5)
 ```
+
+
+
+```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+ggtile1
+```
+]
+
+.panel[.panel-name[Flextable]
 
 ```{r, echo=FALSE}
 propGlob_f
 ```
+
+
 ]
 
 .panel[.panel-name[Interpretación]
@@ -365,6 +367,29 @@ propGlob_f
 .panel[.panel-name[R Code]
 
 ```{r}
+## Tile plot
+df0_tile = select(df0, EDUCATION, MARRIAGE, LIMIT_BAL)
+
+df0_tile2 = df0_tile %>% group_by(EDUCATION, MARRIAGE) %>%
+                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame() %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) 
+
+df0_tile2 = df0_tile2[order(df0_tile2$MARRIAGE), ]
+names(df0_tile2) = c("Educacion", "Estado_civil", "mean_cred_limit", "mean_cred_limit_h")
+rownames(df0_tile2)<-1:nrow(df0_tile2)
+
+ggtile1 = ggplot(df0_tile2, aes( x= Educacion, y = Estado_civil, fill = mean_cred_limit)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("Limite crediticio promedio por eduación y por estado civil (miles de dólares)")+
+  geom_text(aes(label = mean_cred_limit_h), color = "white", size = 5)
+```
+
+
+```{r}
+##Flextable
 propGlob = apply(
   prop.table(table(df0$EDUCATION, df0$MARRIAGE))*100,
   2,
@@ -381,17 +406,15 @@ propGlob_f = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("gradu
 
 <!-- cerrando diapositiva panel set 3 -->
 
-
-<!-- diapo-slide perfiles -->
 ---
+<!-- abriendo diapositiva panel set 4 -->
 
----
 
-<!-- inicianod analsiis de perfiles -->
 
----
+
+
 .panelset[
-.panel[.panel-name[PLot]
+.panel[.panel-name[Plot]
 
 ```{r, include=FALSE}
 ggagebp = ggplot(df0) +
@@ -430,6 +453,9 @@ gglimbp = ggplot(df0) +
 ```
 ]
 ]
+
+---
+### Análisis de perfiles
 
 ---
 
@@ -471,20 +497,68 @@ net_differences_bymonths$CLIENT_TYPE = as.factor(net_differences_bymonths$CLIENT
 net_differences_bymonths$CLIENT_PROFILE = apply(net_differences_bymonths_pay[,-1], 1, mode_function)
 net_differences_bymonths$CLIENT_PROFILE = factor(net_differences_bymonths$CLIENT_PROFILE, levels = c(-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8), labels =  c('Perfil_1','Perfil_2', 'Perfil_3', 'Perfil_4', 'Perfil_4', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5'))
 
-```
-
-
-
-## Análisis de perfiles
-```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
-
 ggperf1 = ggplot(net_differences_bymonths) +
   geom_bar(mapping = aes(x=CLIENT_PROFILE, fill=SEX))+ theme(plot.title=element_text(size=15))+
   ggtitle("Perfil del cliente por sexo")
 
-ggperf1
+ggperf2 = ggplot(net_differences_bymonths) +
+  geom_bar(mapping = aes(x=CLIENT_PROFILE, fill=MARRIAGE))+ theme(plot.title=element_text(size=15))+
+  ggtitle("Perfil del cliente por sexo")
 
 ```
+
+
+```{r, include=FALSE}
+conteos_perfil = c()
+conteos_perfil_p = c()
+for (x in unique(net_differences_bymonths$CLIENT_PROFILE)){
+  temp = nrow(filter(net_differences_bymonths, CLIENT_PROFILE == x))
+  if (temp != 0){
+    conteos_perfil = c(conteos_perfil, temp)
+  }
+}
+conteos_perfil_p = c()
+for (x in conteos_perfil){
+  temp = x / sum(conteos_perfil) * 100
+  conteos_perfil_p = c(conteos_perfil_p, round(temp, 1))
+}
+df_categ = data.frame(categoria = as.factor(unique(net_differences_bymonths$CLIENT_PROFILE[!is.na(net_differences_bymonths$CLIENT_PROFILE)])), conteo = conteos_perfil_p)
+
+conteos_perfil_perc = c()
+for (x in conteos_perfil_p){
+  if (x > 1){
+    temp = glue("{x}%")
+  conteos_perfil_perc = c(conteos_perfil_perc, temp)
+  }
+  else {#Excluyendo valores por debajo del 1 % (nos restorban en el gráfico)
+    conteos_perfil_perc = c(conteos_perfil_perc, "")
+  }
+}
+
+ggpie1 = ggplot(df_categ, aes(x= "",y = conteo, fill = categoria))+
+	geom_bar(stat = "identity", color = "white")+coord_polar(theta = "y") + geom_text(aes(label = conteos_perfil_perc),
+		position = position_stack(vjust = 0.5), color = "white", size = 3)+ labs(title = "Conteo de individuos por perfil de consumidor")
+```
+
+
+.panelset[
+.panel[.panel-name[Plot 1]
+
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+ggpie1
+```
+
+
+]
+.panel[.panel-name[PLot 2]
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+ggperf1 + ggperf2
+```
+
+]
+.panel[.panel-name[R Code]
+
+]]
 
 
 ---

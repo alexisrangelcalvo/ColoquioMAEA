@@ -444,12 +444,15 @@ for (x in conteos_education){
 }
 
 
+conteos_education
+
 df_categ = data.frame(categoria = as.factor(unique(df0$EDUCATION[!is.na(df0$EDUCATION)])), conteo = conteos_education_p)
 ggplot(df_categ,aes(x= "",y = conteo, fill = categoria))+
 	geom_bar(stat = "identity", color = "white")+coord_polar(theta = "y") + geom_text(aes(label = conteos_education_p),
 		position = position_stack(vjust = 0.5), color = "white", size = 3)+ labs(title = "Conteo de individuos por nivel educativo")
   
 ```
+
 
 ## Libreria flex table
 
@@ -623,6 +626,25 @@ ggplot(df_payments4, aes( x= EDUCATION, y = MARRIAGE, fill = default.payment.nex
 
 "Que nos indica la graf anterior?"
 ```
+```{r}
+df0_tile = select(df0, EDUCATION, MARRIAGE, LIMIT_BAL)
+
+df0_tile2 = df0_tile %>% group_by(EDUCATION, MARRIAGE) %>%
+                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame() %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) 
+
+df0_tile2 = df0_tile2[order(df0_tile2$MARRIAGE), ]
+names(df0_tile2) = c("Educacion", "Estado_civil", "mean_cred_limit", "mean_cred_limit_h")
+rownames(df0_tile2)<-1:nrow(df0_tile2)
+
+ggplot(df0_tile2, aes( x= Educacion, y = Estado_civil, fill = mean_cred_limit)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("Limite crediticio promedio por eduación y por estado civil (miles de dólares)")+
+  geom_text(aes(label = mean_cred_limit_h), color = "white", size = 3)
+```
 
 
 
@@ -730,6 +752,144 @@ ggperf1 = ggplot(net_differences_bymonths) +
 ggperf1
 ```
 
+```{r}
+conteos_perfil = c()
+conteos_perfil_p = c()
+for (x in unique(net_differences_bymonths$CLIENT_PROFILE)){
+  temp = nrow(filter(net_differences_bymonths, CLIENT_PROFILE == x))
+  if (temp != 0){
+    conteos_perfil = c(conteos_perfil, temp)
+  }
+}
+conteos_perfil_p = c()
+for (x in conteos_perfil){
+  temp = x / sum(conteos_perfil) * 100
+  conteos_perfil_p = c(conteos_perfil_p, round(temp, 1))
+}
+df_categ = data.frame(categoria = as.factor(unique(net_differences_bymonths$CLIENT_PROFILE[!is.na(net_differences_bymonths$CLIENT_PROFILE)])), conteo = conteos_perfil_p)
+
+conteos_perfil_perc = c()
+for (x in conteos_perfil_p){
+  if (x > 1){
+    temp = glue("{x}%")
+  conteos_perfil_perc = c(conteos_perfil_perc, temp)
+  }
+  else {#Excluyendo valores por debajo del 1 % (nos restorban en el gráfico)
+    conteos_perfil_perc = c(conteos_perfil_perc, "")
+  }
+}
+
+ggplot(df_categ, aes(x= "",y = conteo, fill = categoria))+
+	geom_bar(stat = "identity", color = "white")+coord_polar(theta = "y") + geom_text(aes(label = conteos_perfil_perc),
+		position = position_stack(vjust = 0.5), color = "white", size = 3)+ labs(title = "Conteo de individuos por perfil de consumidor")
+```
+```{r}
+names(net_differences_bymonths)
+
+#PERFIL # NIV EDU # MEAN(LIMITBAL)
+
+net_differences_bymonths2 = select(net_differences_bymonths, CLIENT_PROFILE, EDUCATION, MARRIAGE, LIMIT_BAL)
+
+names(net_differences_bymonths2)
+
+
+
+```
+Generando un df agrupado perfil-educación con el promedio del limite crediticio
+# alternativa a group by
+```{r}
+combin = c()
+v1 = c()
+v2 = c()
+prom_combin = c()
+
+for (i in 1:nrow(net_differences_bymonths2))
+  {
+  temp1 = net_differences_bymonths2[i,1]
+  temp2 = net_differences_bymonths2[i,2]
+  uniq = as.character(glue("{temp1} {temp2}"))
+  if (!uniq %in% combin)
+    {
+    combin = c(combin, uniq)
+    v1 = c(v1, glue("{temp1}"))
+    v2 = c(v2, glue("{temp2}"))
+    df_filtr = subset(net_differences_bymonths2, CLIENT_PROFILE == temp1 & EDUCATION == temp2, select =c(CLIENT_PROFILE, EDUCATION, LIMIT_BAL))
+    prom = round(mean(df_filtr$LIMIT_BAL))
+    print(glue("promedio para {temp1} y {temp2} -> {prom}"))
+    prom_combin = c(prom_combin, prom)
+    }
+}
+
+df_tile = data.frame(v1, v2, prom_combin);df_tile
+df_tile = df_tile[order(df_tile$v1), ]
+names(df_tile) = c("Perfil", "Educacion", "mean_cred_limit")
+rownames(df_tile)<-1:nrow(df_tile)
+
+
+ggplot(df_tile, aes( x= Perfil, y = Educacion, fill = mean_cred_limit)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("limite crediticio promedio por perfil y por nivel educativo")+
+  geom_text(aes(label = mean_cred_limit), color = "white", size = 3)
+
+```
+
+Usando grouby de dplyer para generar df agrupado perfil-educación con el promedio del limite crediticio
+```{r}
+df_tile2 = net_differences_bymonths2 %>% group_by(CLIENT_PROFILE, EDUCATION) %>%
+                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame(df_tile2) %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) %>% select(CLIENT_PROFILE, EDUCATION, mean_cred_limit, mean_cred_limit_h)
+
+df_tile2 = df_tile2[order(df_tile2$CLIENT_PROFILE), ]
+names(df_tile2) = c("Perfil", "Educacion", "mean_cred_limit", "mean_cred_limit_h")
+rownames(df_tile2)<-1:nrow(df_tile2)
+
+ggplot(df_tile2, aes( x= Perfil, y = Educacion, fill = mean_cred_limit)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("Limite crediticio promedio por perfil y por nivel educativo (miles de dólares)")+
+  geom_text(aes(label = mean_cred_limit_h), color = "white", size = 3)
+
+```
+
+Usando grouby de dplyer para generar df agrupado perfil-estado civil con el promedio del limite crediticio
+```{r}
+names(net_differences_bymonths2)
+df_tile2 = net_differences_bymonths2 %>% group_by(CLIENT_PROFILE, MARRIAGE) %>%
+                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame(df_tile2) %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) %>% select(CLIENT_PROFILE, MARRIAGE, mean_cred_limit, mean_cred_limit_h)
+
+df_tile2 = df_tile2[order(df_tile2$CLIENT_PROFILE), ]
+names(df_tile2) = c("Perfil", "Estado_civil", "mean_cred_limit", "mean_cred_limit_h")
+rownames(df_tile2)<-1:nrow(df_tile2)
+
+ggplot(df_tile2, aes( x= Perfil, y = Estado_civil, fill = mean_cred_limit)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("Limite crediticio promedio por perfil y por estado civil (miles de dólares)")+
+  geom_text(aes(label = mean_cred_limit_h), color = "white", size = 3)
+
+```
+
+```{r}
+
+head(net_differences_bymonths)
+
+library(corrplot)
+df_cor = select(net_differences_bymonths, LIMIT_BAL, ND_1, ND_2,ND_3, ND_4, ND_5, ND_6)
+cor = cor(df_cor)
+
+corrplot(cor, type="upper", method="number")
+```
+
+
 
 Sacando quantiles del limit bal por tipo de perfil del cliente dado por la moda del estatus de pago a lo largo de los 6 meses
 
@@ -764,10 +924,10 @@ Pruebas de shapiro test y kolmogorov smirnov para la normalidad de los datos
 ```{r}
 library(nortest)
 lillie.test(df_pruebas$LIMIT_BAL)
-shapiro.test(df_lm$LIMIT_BAL[0:500])
+#shapiro.test(df_lm$LIMIT_BAL[0:500])
 
 lillie.test(df_pruebas$AGE)
-shapiro.test(df_lm$AGE[0:500])
+#shapiro.test(df_lm$AGE[0:500])
 
 #Se rechaza la H0, los datos no son normales
 ```
@@ -893,7 +1053,7 @@ La hipótesis nula (H 0 ): El limite de crédito medio es el mismo para todos ls
 
 La hipótesis alternativa: (Ha): Al menos una media del limite de crédito por perfil de cliente es diferente.
 
-Se rechaza la hipotesis nula y se corrobora que la variable de respuesta (monto maximo de crédito) cambia como efecto en el cambio de edad
+Se rechaza la hipotesis nula y se corrobora que la variable de respuesta (monto maximo de crédito) cambia como efecto en el cambio de LIMIT_BAL
 
 
 Prueba post-hoc
@@ -916,8 +1076,12 @@ Prueba post-hoc
 
 ```{r}
 pairwise.wilcox.test(df_pruebas$LIMIT_BAL, df_pruebas$AGE)
-```
 
+
+#QUANTILES AFRUPAR
+```
+CORRELACIÓN EDAD DEPENDIENTE COMO LIMITE DE CREDITO
+REGRESION LINEAL, PROBAR SI ES ESTADISITICAMENTE SIGNIFICATIVA LM
 ```{r}
 library(ggplot2)
 plot(data = df_pruebas, x = CLIENT_PROFILE,  y=LIMIT_BAL)
