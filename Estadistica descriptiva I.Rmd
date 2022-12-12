@@ -788,7 +788,7 @@ names(net_differences_bymonths)
 
 #PERFIL # NIV EDU # MEAN(LIMITBAL)
 
-net_differences_bymonths2 = select(net_differences_bymonths, CLIENT_PROFILE, EDUCATION, MARRIAGE, LIMIT_BAL)
+net_differences_bymonths2 = select(net_differences_bymonths, CLIENT_PROFILE, EDUCATION, MARRIAGE, SEX, LIMIT_BAL)
 
 names(net_differences_bymonths2)
 
@@ -860,14 +860,14 @@ ggplot(df_tile2, aes( x= Perfil, y = Educacion, fill = mean_cred_limit)) +
 Usando grouby de dplyer para generar df agrupado perfil-estado civil con el promedio del limite crediticio
 ```{r}
 names(net_differences_bymonths2)
-df_tile2 = net_differences_bymonths2 %>% group_by(CLIENT_PROFILE, MARRIAGE) %>%
-                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame(df_tile2) %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) %>% select(CLIENT_PROFILE, MARRIAGE, mean_cred_limit, mean_cred_limit_h)
+df_tile3 = net_differences_bymonths2 %>% group_by(CLIENT_PROFILE, MARRIAGE) %>%
+                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame(df_tile3) %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) %>% select(CLIENT_PROFILE, MARRIAGE, mean_cred_limit, mean_cred_limit_h)
 
-df_tile2 = df_tile2[order(df_tile2$CLIENT_PROFILE), ]
-names(df_tile2) = c("Perfil", "Estado_civil", "mean_cred_limit", "mean_cred_limit_h")
-rownames(df_tile2)<-1:nrow(df_tile2)
+df_tile3 = df_tile3[order(df_tile3$CLIENT_PROFILE), ]
+names(df_tile3) = c("Perfil", "Estado_civil", "mean_cred_limit", "mean_cred_limit_h")
+rownames(df_tile3)<-1:nrow(df_tile3)
 
-ggplot(df_tile2, aes( x= Perfil, y = Estado_civil, fill = mean_cred_limit)) +
+ggplot(df_tile3, aes( x= Perfil, y = Estado_civil, fill = mean_cred_limit)) +
   geom_tile(color = "white",
             lwd = 0.1,
             linetype = 1)+
@@ -877,6 +877,25 @@ ggplot(df_tile2, aes( x= Perfil, y = Estado_civil, fill = mean_cred_limit)) +
   geom_text(aes(label = mean_cred_limit_h), color = "white", size = 3)
 
 ```
+
+```{r}
+df_tile4 = net_differences_bymonths2 %>% group_by(CLIENT_PROFILE, SEX) %>%
+                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame(df_tile4) %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) %>% select(CLIENT_PROFILE, SEX, mean_cred_limit, mean_cred_limit_h)
+
+df_tile4 = df_tile4[order(df_tile4$CLIENT_PROFILE), ]
+names(df_tile4) = c("Perfil", "Sexo", "mean_cred_limit", "mean_cred_limit_h")
+rownames(df_tile4)<-1:nrow(df_tile4)
+
+ggplot(df_tile4, aes( x= Perfil, y = Sexo, fill = mean_cred_limit)) +
+  geom_tile(color = "white",
+            lwd = 0.1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("Limite crediticio promedio por perfil y por estado sexo (miles de dólares)")+
+  geom_text(aes(label = mean_cred_limit_h), color = "white", size = 6)
+```
+
 
 ```{r}
 
@@ -889,13 +908,56 @@ cor = cor(df_cor)
 corrplot(cor, type="upper", method="number")
 ```
 
-
-
-Sacando quantiles del limit bal por tipo de perfil del cliente dado por la moda del estatus de pago a lo largo de los 6 meses
-
 ```{r}
+##Flextable
+
+propt = prop.table(table(net_differences_bymonths$EDUCATION, net_differences_bymonths$CLIENT_PROFILE))
+propt <- rbind(propt, Total = colSums(propt))
+propGlob = apply(
+  propt*100,
+  2,
+  function(u) sprintf( "%.1f%%", u )
+)
+
+propGlob
+propGlob_f = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("graduate school", "university", "high school", "others", "TOTALES")) %>% select(variables, Perfil_1, Perfil_2, Perfil_3, Perfil_4,Perfil_5) %>% flextable(col_keys =  c("variables", "Perfil_1","Perfil_2", "Perfil_3", "Perfil_4", "Perfil_5")) %>% theme_vader()
+propGlob_f
 
 ```
+
+```{r}
+##Flextable
+propt = prop.table(table(net_differences_bymonths$MARRIAGE, net_differences_bymonths$CLIENT_PROFILE))
+propt <- rbind(propt, Total = colSums(propt))
+propGlob = apply(
+  propt*100,
+  2,
+  function(u) sprintf( "%.1f%%", u )
+)
+propGlob
+propGlob_f = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("Casado", "Soltero", "Divorciado", "TOTALES")) %>% select(variables, Perfil_1, Perfil_2, Perfil_3, Perfil_4,Perfil_5) %>% flextable(col_keys =  c("variables", "Perfil_1","Perfil_2", "Perfil_3", "Perfil_4", "Perfil_5")) %>% theme_vader()
+propGlob_f
+```
+
+
+```{r}
+##Flextable
+
+propt = prop.table(table(net_differences_bymonths$SEX, net_differences_bymonths$CLIENT_PROFILE))
+propt <- rbind(propt, Total = colSums(propt))
+propGlob = apply(
+  propt*100,
+  2,
+  function(u) sprintf( "%.1f%%", u )
+)
+propGlob
+propGlob_f = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("Hombre", "Mujer", "TOTALES")) %>% select(variables, Perfil_1, Perfil_2, Perfil_3, Perfil_4,Perfil_5) %>% flextable(col_keys =  c("variables", "Perfil_1","Perfil_2", "Perfil_3", "Perfil_4", "Perfil_5")) %>% theme_vader()
+propGlob_f
+
+
+```
+Sacando quantiles del limit bal por tipo de perfil del cliente dado por la moda del estatus de pago a lo largo de los 6 meses
+
 
 Sacando un box plot con el mismo ejercicio
 ```{r}
@@ -1087,8 +1149,47 @@ library(ggplot2)
 plot(data = df_pruebas, x = CLIENT_PROFILE,  y=LIMIT_BAL)
 ```
 
+###################### REALIZANDO OTRA VEZ LOS ANOVAS Y PAREOS ##################
 
 
+```{r}
+library(nortest)
+bd_anovas = select(net_differences_bymonths, ID, MARRIAGE, EDUCATION, SEX, AGE, CLIENT_PROFILE, LIMIT_BAL)
+
+anova1 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$MARRIAGE)
+summary(anova1)
+TukeyHSD(anova1)
+res1 = residuals(anova1)
+lillie.test(res1)
+
+anova2 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$EDUCATION)
+summary(anova2)
+TukeyHSD(anova2)
+res2 = residuals(anova2)
+lillie.test(res2)
+
+anova3 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$SEX)
+summary(anova3)
+TukeyHSD(anova3)
+res3 = residuals(anova3)
+lillie.test(res3)
+
+# anova4 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$AGE)
+# summary(anova4)
+# TukeyHSD(anova4)
+
+anova5 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$CLIENT_PROFILE)
+summary(anova5)
+TukeyHSD(anova5)
+res5 = residuals(anova5)
+lillie.test(res5)
+
+
+```
+
+
+
+###################################
 
 APARTADO DE CONCLUSIONES:
 

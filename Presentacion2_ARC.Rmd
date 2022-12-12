@@ -52,7 +52,7 @@ s
 
 <Br>
 
-<div style="text-align: justify">*¿Hay alguna de estas variables que pueda explicar el por qué algunos clientes tienen mucho más limite crediticio que otros? ¿Se puede modelar una aproxiumación a dicha relación?*<div/>
+<div style="text-align: justify">*¿Hay alguna de estas variables (edad, estado civil, el comportamiento crediticio mes con mes) que pueda explicar el por qué algunos clientes tienen mucho más limite crediticio que otros? ¿Se puede modelar una aproximación a dicha relación?*<div/>
 <Hr>
 
 ---
@@ -60,7 +60,7 @@ s
 ###Objetivo general
 
 
-<div style="text-align: justify">Encontrar la relación de las variables que disponemos para cada cliente, especialmente de la variable edad y del comportamiento mes con mes en los seis periodos, con el limite crediticio. <div/>
+<div style="text-align: justify">Encontrar la relación de las variables que disponemos para cada cliente, con su limite crediticio. <div/>
 <Hr>
 
 
@@ -312,6 +312,53 @@ ggarea1 = ggplot(df0, aes(x=AGE, fill=EDUCATION)) +
 
 <!-- abriendo diapositiva panel set 3-->
 .panelset[
+.panel[.panel-name[Plot]
+
+```{r, include=FALSE}
+ggagebp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=MARRIAGE, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución del crédito máximo por estado civil y sexo")
+gglimbp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución del crédito máximo por nivel educativo y sexo")
+```
+
+```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+ggagebp / gglimbp
+```
+]
+
+.panel[.panel-name[Interpretación]
+
+**Aquí ira una breve interpretación de la anterior tabla**
+
+]
+
+.panel[.panel-name[R Code]
+
+```{r}
+ggagebp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = AGE, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución de la edad por nivel educativo y sexo")
+
+
+```
+
+```{r}
+gglimbp = ggplot(df0) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=10))+
+ ggtitle("Distribución del crédito máximo por nivel educativo y sexo")
+```
+]
+]
+
+<!-- cerrando diapositiva panel set 3 -->
+
+---
+<!-- abriendo diapositiva panel set 4 -->
+
+
+.panelset[
 .panel[.panel-name[Tile plot]
 
 ```{r, include=FALSE}
@@ -351,6 +398,7 @@ ggtile1
 
 .panel[.panel-name[Flextable]
 
+**¿Qué porcentaje de la muestra representa cada grupo educación-estado civil?**
 ```{r, echo=FALSE}
 propGlob_f
 ```
@@ -404,55 +452,6 @@ propGlob_f = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("gradu
 ]
 ]
 
-<!-- cerrando diapositiva panel set 3 -->
-
----
-<!-- abriendo diapositiva panel set 4 -->
-
-
-
-
-
-.panelset[
-.panel[.panel-name[Plot]
-
-```{r, include=FALSE}
-ggagebp = ggplot(df0) +
-  geom_boxplot(mapping = aes(x=EDUCATION, y = AGE, fill=SEX))+ theme(plot.title=element_text(size=10))+
- ggtitle("Distribución de la edad por nivel educativo y sexo")
-gglimbp = ggplot(df0) +
-  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=10))+
- ggtitle("Distribución del crédito máximo por nivel educativo y sexo")
-```
-
-```{r, fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
-ggagebp / gglimbp
-```
-]
-
-.panel[.panel-name[Interpretación]
-
-**Aquí ira una breve interpretación de la anterior tabla**
-
-]
-
-.panel[.panel-name[R Code]
-
-```{r}
-ggagebp = ggplot(df0) +
-  geom_boxplot(mapping = aes(x=EDUCATION, y = AGE, fill=SEX))+ theme(plot.title=element_text(size=10))+
- ggtitle("Distribución de la edad por nivel educativo y sexo")
-
-
-```
-
-```{r}
-gglimbp = ggplot(df0) +
-  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=10))+
- ggtitle("Distribución del crédito máximo por nivel educativo y sexo")
-```
-]
-]
 
 ---
 ### Análisis de perfiles
@@ -562,19 +561,213 @@ ggperf1 + ggperf2
 
 
 ---
+.panelset[
+.panel[.panel-name[Boxplot]
+
 ```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
-gglimbp2 =  ggplot(net_differences_bymonths) +
-  geom_boxplot(mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=SEX))+ theme(plot.title=element_text(size=15))+
-  ggtitle("Distribución del limite crediticio por perfil del cliente y por sexo")
+gglimbp2 =  ggplot(net_differences_bymonths, mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=SEX)) +
+  geom_boxplot()+
+  stat_summary(fun= "mean", geom = "point", shape = 23, size = 3, fill = "white")+
+  annotate("text",
+           x = 1:length(table(net_differences_bymonths$CLIENT_PROFILE)),
+           y = aggregate(LIMIT_BAL ~ CLIENT_PROFILE, net_differences_bymonths, median)[ , 2],
+           label = table(net_differences_bymonths$CLIENT_PROFILE),
+           col = "red",
+           vjust = - 27)+
+  theme(plot.title=element_text(size=15))+
+  ggtitle("Distribución del limite crediticio por perfil del cliente y por sexo (con media y conteo)")
 
 gglimbp2
 ```
 
+
+]
+.panel[.panel-name[Heatmap]
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+
+net_differences_bymonths2 = select(net_differences_bymonths, CLIENT_PROFILE, EDUCATION, MARRIAGE, SEX, LIMIT_BAL)
+df_tile4 = net_differences_bymonths2 %>% group_by(CLIENT_PROFILE, SEX) %>%
+                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame(df_tile4) %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) %>% select(CLIENT_PROFILE, SEX, mean_cred_limit, mean_cred_limit_h)
+
+df_tile4 = df_tile4[order(df_tile4$CLIENT_PROFILE), ]
+names(df_tile4) = c("Perfil", "Sexo", "mean_cred_limit", "mean_cred_limit_h")
+rownames(df_tile4)<-1:nrow(df_tile4)
+
+ggplot(df_tile4, aes( x= Perfil, y = Sexo, fill = mean_cred_limit)) +
+  geom_tile(color = "white",
+            lwd = 1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("Limite crediticio promedio por perfil y por estado sexo (miles de dólares)")+
+  geom_text(aes(label = mean_cred_limit_h), color = "white", size = 6)
+df_tile4
+```
+
+]
+.panel[.panel-name[Flextable]
+
+```{r, include=FALSE}
+##Flextable
+propt = prop.table(table(net_differences_bymonths$SEX, net_differences_bymonths$CLIENT_PROFILE))
+propt <- rbind(propt, Total = colSums(propt))
+propGlob = apply(
+  propt*100,
+  2,
+  function(u) sprintf( "%.1f%%", u )
+)
+propGlob
+propGlob_f2 = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("Hombre", "Mujer", "TOTALES")) %>% select(variables, Perfil_1, Perfil_2, Perfil_3, Perfil_4,Perfil_5) %>% flextable(col_keys =  c("variables", "Perfil_1","Perfil_2", "Perfil_3", "Perfil_4", "Perfil_5")) %>% theme_vader()
+
+
+```
+
+```{r, echo=FALSE}
+propGlob_f2
+```
+
+]]
+
+
+
 ---
 
+.panelset[
+.panel[.panel-name[Boxplot]
+
 ```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
-gglimbp3 = ggplot(net_differences_bymonths) +
-  geom_boxplot(mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=EDUCATION))+ theme(plot.title=element_text(size=14))+
+gglimbp3 = ggplot(net_differences_bymonths, mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=EDUCATION)) +
+  geom_boxplot()+
+  stat_summary(fun= "mean", geom = "point", shape = 23, size = 3, fill = "white")+
+  annotate("text",
+           x = 1:length(table(net_differences_bymonths$CLIENT_PROFILE)),
+           y = aggregate(LIMIT_BAL ~ CLIENT_PROFILE, net_differences_bymonths, median)[ , 2],
+           label = table(net_differences_bymonths$CLIENT_PROFILE),
+           col = "red",
+           vjust = - 27)+ theme(plot.title=element_text(size=14))+
   ggtitle("Distribución del limite crediticio por perfil del cliente y por educación")
 gglimbp3
 ```
+
+
+]
+.panel[.panel-name[Heatmap]
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+
+df_tile2 = net_differences_bymonths2 %>% group_by(CLIENT_PROFILE, EDUCATION) %>%
+                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame(df_tile2) %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) %>% select(CLIENT_PROFILE, EDUCATION, mean_cred_limit, mean_cred_limit_h)
+
+df_tile2 = df_tile2[order(df_tile2$CLIENT_PROFILE), ]
+names(df_tile2) = c("Perfil", "Educacion", "mean_cred_limit", "mean_cred_limit_h")
+rownames(df_tile2)<-1:nrow(df_tile2)
+
+ggplot(df_tile2, aes( x= Perfil, y = Educacion, fill = mean_cred_limit)) +
+  geom_tile(color = "white",
+            lwd = 1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("Limite crediticio promedio por perfil y por nivel educativo (miles de dólares)")+
+  geom_text(aes(label = mean_cred_limit_h), color = "white", size = 6)
+df_tile2
+```
+
+]
+.panel[.panel-name[Flextable]
+
+```{r, include=FALSE}
+##Flextable
+
+propt = prop.table(table(net_differences_bymonths$EDUCATION, net_differences_bymonths$CLIENT_PROFILE))
+propt <- rbind(propt, Total = colSums(propt))
+propGlob = apply(
+  propt*100,
+  2,
+  function(u) sprintf( "%.1f%%", u )
+)
+
+propGlob
+propGlob_f2 = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("graduate school", "university", "high school", "others", "TOTALES")) %>% select(variables, Perfil_1, Perfil_2, Perfil_3, Perfil_4,Perfil_5) %>% flextable(col_keys =  c("variables", "Perfil_1","Perfil_2", "Perfil_3", "Perfil_4", "Perfil_5")) %>% theme_vader()
+
+```
+
+```{r, echo=FALSE}
+propGlob_f2
+```
+
+]]
+
+
+---
+
+
+
+.panelset[
+.panel[.panel-name[Boxplot]
+
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+gglimbp3 = ggplot(net_differences_bymonths, mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=MARRIAGE))+
+  geom_boxplot()+
+  stat_summary(fun= "mean", geom = "point", shape = 23, size = 3, fill = "white")+
+  annotate("text",
+           x = 1:length(table(net_differences_bymonths$CLIENT_PROFILE)),
+           y = aggregate(LIMIT_BAL ~ CLIENT_PROFILE, net_differences_bymonths, median)[ , 2],
+           label = table(net_differences_bymonths$CLIENT_PROFILE),
+           col = "red",
+           vjust = - 27)+ theme(plot.title=element_text(size=14))+ theme(plot.title=element_text(size=14))+
+  ggtitle("Distribución del limite crediticio por perfil del cliente y por estado civil")
+gglimbp3
+```
+
+
+]
+.panel[.panel-name[Heatmap]
+```{r fig.asp = 3/4, fig.align = 'center', echo = FALSE, out.width = "100%", dpi= 300, warning = FALSE}
+
+df_tile3 = net_differences_bymonths2 %>% group_by(CLIENT_PROFILE, MARRIAGE) %>%
+                   summarise(mean_cred_limit = round(mean(LIMIT_BAL)), .groups = 'drop') %>%  as.data.frame(df_tile3) %>% mutate(mean_cred_limit_h = round(mean_cred_limit / 1000)) %>% select(CLIENT_PROFILE, MARRIAGE, mean_cred_limit, mean_cred_limit_h)
+
+df_tile3 = df_tile3[order(df_tile3$CLIENT_PROFILE), ]
+names(df_tile3) = c("Perfil", "Estado_civil", "mean_cred_limit", "mean_cred_limit_h")
+rownames(df_tile3)<-1:nrow(df_tile3)
+
+ggplot(df_tile3, aes( x= Perfil, y = Estado_civil, fill = mean_cred_limit)) +
+  geom_tile(color = "white",
+            lwd = 1,
+            linetype = 1)+
+  guides(fill = guide_colourbar(barwidth = 0.5,
+                                barheight = 12))+ theme(plot.title=element_text(size=10))+
+  ggtitle("Limite crediticio promedio por perfil y por estado civil (miles de dólares)")+
+  geom_text(aes(label = mean_cred_limit_h), color = "white", size = 6)
+df_tile3
+```
+
+]
+.panel[.panel-name[Flextable]
+
+```{r, include=FALSE}
+##Flextable
+propt = prop.table(table(net_differences_bymonths$MARRIAGE, net_differences_bymonths$CLIENT_PROFILE))
+propt <- rbind(propt, Total = colSums(propt))
+propGlob = apply(
+  propt*100,
+  2,
+  function(u) sprintf( "%.1f%%", u )
+)
+propGlob
+propGlob_f4 = propGlob %>% as.data.frame.matrix() %>% mutate(variables = c("Casado", "Soltero", "Divorciado", "TOTALES")) %>% select(variables, Perfil_1, Perfil_2, Perfil_3, Perfil_4,Perfil_5) %>% flextable(col_keys =  c("variables", "Perfil_1","Perfil_2", "Perfil_3", "Perfil_4", "Perfil_5")) %>% theme_vader()
+```
+
+```{r, echo=FALSE}
+propGlob_f4
+```
+
+
+]]
+
+---
+
+
+
+
+
