@@ -262,4 +262,35 @@ group_by(df1, SEX, EDUCATION, MARRIAGE) |>
   summarise(mean(AGE), mean(LIMIT_BAL)) |>
   arrange(EDUCATION)
 ```
+PRACTICANDO EL OPERADOR PIPE (TUBERIA)
+
+Generando un vector de 100 numeros aleatorios con media 0 y desvesta 1 (con la función rnorm), sacandole el absoluto, ordenandolos de menor a mayor
+```{r}
+library(magrittr)
+
+#Forma 1
+sort(abs(rnorm(100)))
+
+#Forma 2
+
+rnorm(100) %>% abs() %>% sort()
+
+
+```
+
+Seleccionar las columnas cyl, hp, drat de mtcars. FIltrar los renglones  en los que cyl sea diferente a 6, renombrar la columna cyl por cilindros y finalmente obtener un resumen estadístico para las columnas
+```{r}
+library(dplyr)
+
+df1_mtcars = select(mtcars, cyl, hp, disp)
+df1_mtcars = filter(df1_mtcars, cyl != 6); df1_mtcars
+res_1 = summarise(df1_mtcars); res_1
+
+res_1 = summary(rename(filter(select(mtcars, cyl, hp, disp), cyl != 6), cilindros = cyl));res_1
+
+
+res_2 = select(mtcars, cyl, hp, disp) %>% filter(cyl != 6) %>% rename(cilindros = cyl) %>% summary(); res_2
+
+
+```
 

@@ -132,6 +132,25 @@ df0$PAY_4 = as.factor(df0$PAY_4)
 df0$PAY_5 = as.factor(df0$PAY_5)
 #df0$PAY_6[df0$PAY_6 == -2] = 0
 df0$PAY_6 = as.factor(df0$PAY_6)
+
+quantil_func = function (x) {
+  if (x >= 21 & x <= 28){
+    return ("21 - 28 anios")
+  }
+  else if (x > 28 & x <= 34){
+    return ("29 - 34 anios")
+  }
+  else if (x > 34 & x <= 41){
+    return ("35 - 41 anios")
+  }
+  else if (41 < x){
+    return ("42 - 79 anios")
+  }
+}
+quantile(df0$AGE)
+df0$QUANTILE_AGE = sapply(df0$AGE, quantil_func) 
+df0$QUANTILE_AGE
+str(df0)
 "
 -2: No consumption; -1: Paid in full; 0: The use of revolving credit; 1 = payment delay for one month; 2 = payment delay for two months; . . .; 8 = payment delay for eight months; 9 = payment delay for nine months and above.
 "
@@ -654,9 +673,9 @@ ggplot(df0_tile2, aes( x= Educacion, y = Estado_civil, fill = mean_cred_limit)) 
 
 unique(df0$EDUCATION)
 net_differences_bymonths = df0 %>% 
-  mutate(ND_1 = BILL_AMT1-PAY_AMT1, ND_2 = BILL_AMT2 - PAY_AMT2, ND_3 = BILL_AMT3 - PAY_AMT3, ND_4 = BILL_AMT4 - PAY_AMT4, ND_5 = BILL_AMT5 - PAY_AMT5, ND_6 = BILL_AMT6 - PAY_AMT6) %>% select(ID, SEX, MARRIAGE, AGE, EDUCATION, LIMIT_BAL, PAY_1, PAY_AMT1, BILL_AMT1, ND_1, PAY_2, PAY_AMT2, BILL_AMT2, ND_2, PAY_3, PAY_AMT3, BILL_AMT3, ND_3, PAY_4, PAY_AMT4, BILL_AMT4, ND_4, PAY_5, PAY_AMT5, BILL_AMT5, ND_5, PAY_6, PAY_AMT6, BILL_AMT6, ND_6, default.payment.next.month)
+  mutate(ND_1 = BILL_AMT1-PAY_AMT1, ND_2 = BILL_AMT2 - PAY_AMT2, ND_3 = BILL_AMT3 - PAY_AMT3, ND_4 = BILL_AMT4 - PAY_AMT4, ND_5 = BILL_AMT5 - PAY_AMT5, ND_6 = BILL_AMT6 - PAY_AMT6) %>% select(ID, SEX, MARRIAGE, AGE, QUANTILE_AGE, EDUCATION, LIMIT_BAL, PAY_1, PAY_AMT1, BILL_AMT1, ND_1, PAY_2, PAY_AMT2, BILL_AMT2, ND_2, PAY_3, PAY_AMT3, BILL_AMT3, ND_3, PAY_4, PAY_AMT4, BILL_AMT4, ND_4, PAY_5, PAY_AMT5, BILL_AMT5, ND_5, PAY_6, PAY_AMT6, BILL_AMT6, ND_6, default.payment.next.month)
 
-net_differences_bymonths
+#str(net_differences_bymonths)
 "
 -2: No consumption; -1: Paid in full; 0: The use of revolving credit; 1 = payment delay for one month; 2 = payment delay for two months; . . .; 8 = payment delay for eight months; 9 = payment delay for nine months and above.
 "
@@ -692,11 +711,12 @@ net_differences_bymonths_pay = net_differences_bymonths %>% select(PAY_1, PAY_2,
 
 net_differences_bymonths$CLIENT_TYPE = apply(net_differences_bymonths_pay[,-1], 1, mode_function)
 net_differences_bymonths$CLIENT_TYPE = as.factor(net_differences_bymonths$CLIENT_TYPE)
+#net_differences_bymonths$QUANTILE_AGE = as.factor(net_differences_bymonths$QUANTILE_AGE)
 net_differences_bymonths$CLIENT_PROFILE = apply(net_differences_bymonths_pay[,-1], 1, mode_function)
 net_differences_bymonths$CLIENT_PROFILE = factor(net_differences_bymonths$CLIENT_PROFILE, levels = c(-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8), labels =  c('Perfil_1','Perfil_2', 'Perfil_3', 'Perfil_4', 'Perfil_4', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5', 'Perfil_5'))
 
 
-
+str(net_differences_bymonths)
 
 ```
 
@@ -737,12 +757,45 @@ gglimbp2
 ```
 
 ```{r}
+gglimbp2_2 =  ggplot(net_differences_bymonths) +
+  geom_boxplot(mapping = aes(x=SEX, y = LIMIT_BAL, fill= CLIENT_PROFILE))+ theme(plot.title=element_text(size=15))+
+  ggtitle("Distribución del limite crediticio por sexo y perfil del cliente")
+
+gglimbp2_2
+```
+
+
+```{r}
 gglimbp3 = ggplot(net_differences_bymonths) +
   geom_boxplot(mapping = aes(x=CLIENT_PROFILE, y = LIMIT_BAL, fill=EDUCATION))+ theme(plot.title=element_text(size=14))+
   ggtitle("Distribución del limite crediticio por perfil del cliente y por educación")
 gglimbp3
 ```
 
+```{r}
+gglimbp3_2 = ggplot(net_differences_bymonths) +
+  geom_boxplot(mapping = aes(x=EDUCATION, y = LIMIT_BAL, fill=CLIENT_PROFILE))+ theme(plot.title=element_text(size=14))+
+  ggtitle("Distribución del limite crediticio por educación y perfil del cliente")
+gglimbp3_2
+```
+```{r}
+gglimbp4_2 = ggplot(net_differences_bymonths) +
+  geom_boxplot(mapping = aes(x=MARRIAGE, y = LIMIT_BAL, fill=CLIENT_PROFILE))+ theme(plot.title=element_text(size=14))+
+  ggtitle("Distribución del limite crediticio por civil y perfil del cliente")
+gglimbp4_2
+```
+
+
+```{r}
+unique(net_differences_bymonths$QUANTILE_AGE)
+#levels(net_differences_bymonths$QUANTILE_AGE) <- c('42 - 79 anios', '35 - 41 anios', '29 - 34 anios','21 - 28 anios')
+
+net_differences_bymonths$QUANTILE_AGE = factor(net_differences_bymonths$QUANTILE_AGE, levels = c('42 - 79 anios', '35 - 41 anios', '29 - 34 anios','21 - 28 anios'))
+gglimbp5_2 = ggplot(net_differences_bymonths) +
+  geom_boxplot(mapping = aes(x=QUANTILE_AGE, y = LIMIT_BAL, fill=CLIENT_PROFILE))+ theme(plot.title=element_text(size=14))+
+  ggtitle("Distribución del limite crediticio por quantil de edad y perfil")
+gglimbp5_2
+```
 
 ```{r}
 ggperf1 = ggplot(net_differences_bymonths) +
@@ -1096,6 +1149,7 @@ No se cumplen los supuestos para realizar un modelo ANOVA
 
 
 ```{r}
+
 tukey1 = TukeyHSD(aov(anova2))
 plot(tukey1, col="red", las=1, cex.axis=0.5, cex.lab=0.5, cex=0.5)
 ```
@@ -1137,7 +1191,7 @@ kruskal.test(LIMIT_BAL, AGE, data = net_differences_bymonths)
 Prueba post-hoc
 
 ```{r}
-pairwise.wilcox.test(df_pruebas$LIMIT_BAL, df_pruebas$AGE)
+#pairwise.wilcox.test(df_pruebas$LIMIT_BAL, df_pruebas$AGE)
 
 
 #QUANTILES AFRUPAR
@@ -1153,8 +1207,10 @@ plot(data = df_pruebas, x = CLIENT_PROFILE,  y=LIMIT_BAL)
 
 
 ```{r}
-library(nortest)
-bd_anovas = select(net_differences_bymonths, ID, MARRIAGE, EDUCATION, SEX, AGE, CLIENT_PROFILE, LIMIT_BAL)
+#library(nortest)
+bd_anovas = select(net_differences_bymonths, ID, MARRIAGE, EDUCATION, SEX, QUANTILE_AGE, CLIENT_PROFILE, LIMIT_BAL)
+
+#str(bd_anovas)
 
 anova1 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$MARRIAGE)
 summary(anova1)
@@ -1165,27 +1221,86 @@ lillie.test(res1)
 anova2 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$EDUCATION)
 summary(anova2)
 TukeyHSD(anova2)
-res2 = residuals(anova2)
-lillie.test(res2)
+#res2 = residuals(anova2)
+#lillie.test(res2)
 
 anova3 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$SEX)
 summary(anova3)
 TukeyHSD(anova3)
-res3 = residuals(anova3)
-lillie.test(res3)
+#res3 = residuals(anova3)
+#lillie.test(res3)
 
-# anova4 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$AGE)
-# summary(anova4)
-# TukeyHSD(anova4)
+anova4 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$QUANTILE_AGE)
+summary(anova4)
+TukeyHSD(anova4)
+#res4 = residuals(anova4)
+#lillie.test(res4)
 
 anova5 = aov(bd_anovas$LIMIT_BAL ~ bd_anovas$CLIENT_PROFILE)
 summary(anova5)
 TukeyHSD(anova5)
-res5 = residuals(anova5)
-lillie.test(res5)
+#res5 = residuals(anova5)
+#lillie.test(res5)
 
 
 ```
+
+
+```{r}
+#NORMALIDAD
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$MARRIAGE == "single"] ) 
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$MARRIAGE == "married"] ) 
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$MARRIAGE == "divorced"] ) 
+
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$EDUCATION == "university"] ) 
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$EDUCATION == "graduate school"] ) 
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$EDUCATION == "high school"] ) 
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$EDUCATION == "others"] ) 
+
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$CLIENT_PROFILE == "Perfil_1"] ) 
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$CLIENT_PROFILE == "Perfil_2"] ) 
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$CLIENT_PROFILE == "Perfil_3"] ) 
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$CLIENT_PROFILE == "Perfil_4"] ) 
+lillie.test( bd_anovas$LIMIT_BAL[bd_anovas$CLIENT_PROFILE == "Perfil_5"] ) 
+
+#No se rechaza la hipotesis nula, no  hay noramlidad en nuestros datos
+
+#HOMOGENEIDAD
+bartlett.test( LIMIT_BAL ~ MARRIAGE, 
+               data = bd_anovas )
+bartlett.test( LIMIT_BAL ~ EDUCATION, 
+               data = bd_anovas )
+bartlett.test( LIMIT_BAL ~ CLIENT_PROFILE, 
+               data = bd_anovas )
+#No se rechaza la hipotesis nula, no  hay homogeneidad en las varianzas
+```
+
+```{r}
+
+kruskal.test(LIMIT_BAL ~ MARRIAGE, data = bd_anovas)
+
+pairwise.t.test( bd_anovas$LIMIT_BAL, 
+                 bd_anovas$MARRIAGE, 
+                 p.adj = "bonferroni")
+#
+kruskal.test(LIMIT_BAL ~ EDUCATION, data = bd_anovas)
+
+pairwise.t.test( bd_anovas$LIMIT_BAL, 
+                 bd_anovas$EDUCATION, 
+                 p.adj = "bonferroni")
+#
+kruskal.test(LIMIT_BAL ~ CLIENT_PROFILE, data = bd_anovas)
+
+pairwise.t.test( bd_anovas$LIMIT_BAL, 
+                 bd_anovas$CLIENT_PROFILE, 
+                 p.adj = "bonferroni")
+
+#
+
+
+```
+
+
 
 
 
